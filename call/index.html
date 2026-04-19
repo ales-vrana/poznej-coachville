@@ -8,7 +8,8 @@
   <meta property="og:title" content="Domluv si 10min rozhovor — Poznej CoachVille" />
   <meta property="og:description" content="10 minut s Alešem — odpovíme na otázky a zjistíme, jestli je CoachVille pro tebe." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://poznej.coachville.cz/call" />
+  <meta property="og:url" content="https://poznej.coachville.eu/call" />
+  <link rel="canonical" href="https://poznej.coachville.eu/call" />
   <title>Rezervuj hovor — Poznej CoachVille</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,14 +20,19 @@
   <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
   <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 
+  <!-- Meta Pixel Code -->
   <script>
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
     n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
     n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
     t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
     document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    // fbq('init','PIXEL_ID_HERE'); fbq('track','PageView'); fbq('trackCustom','CallPageView');
+    fbq('init','884397061610419');
+    fbq('track','PageView');
+    fbq('trackCustom','CallPageView');
   </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=884397061610419&ev=PageView&noscript=1" /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 <body>
   <header class="site-header site-header--solid">
@@ -126,8 +132,8 @@
         <div class="alt-paths">
           <p class="alt-paths__title">Chceš si to nejdřív v klidu projít?</p>
           <div class="alt-paths__buttons">
-            <a class="btn btn-secondary" href="https://docs.google.com/document/d/1_2Sj7arC47n_c23oOVXTzFNx1IIJ0mYmiFBhmGi-C64/edit" target="_blank" rel="noopener">Přečíst nabídku · 5 min</a>
-            <a class="btn btn-primary" href="../video/index.html">
+            <a class="btn btn-secondary" href="https://docs.google.com/document/d/1_2Sj7arC47n_c23oOVXTzFNx1IIJ0mYmiFBhmGi-C64/edit" target="_blank" rel="noopener" data-door="doc">Přečíst nabídku · 5 min</a>
+            <a class="btn btn-primary" href="../video/index.html" data-door="video">
               Pustit video · 20 min
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
@@ -150,6 +156,11 @@
   </footer>
 
   <script>
+    document.querySelectorAll('[data-door]').forEach(el => {
+      el.addEventListener('click', () => {
+        try { if (window.fbq) window.fbq('trackCustom','DoorClick',{door: el.dataset.door}); } catch(e){}
+      });
+    });
     window.addEventListener('message', function(e) {
       if (e.origin !== 'https://calendly.com') return;
       if (e.data && e.data.event && typeof e.data.event === 'string' && e.data.event.indexOf('event_scheduled') !== -1) {
