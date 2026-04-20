@@ -349,6 +349,14 @@ p { line-height: 1.7; }
   letter-spacing: 0.03em;
 }
 
+.primary-cta__hint {
+  margin: 0 auto 1rem;
+  font-size: 0.9375rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.01em;
+}
+
 /* Opakovaná CTA pod social proof uvnitř hero */
 .primary-cta--repeat {
   margin-top: clamp(2.5rem, 5vw, 3.5rem);
