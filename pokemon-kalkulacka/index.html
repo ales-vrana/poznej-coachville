@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulačka návratnosti Pokémon | CoachVille Europe</title>
+<meta name="description" content="Spočítej si reálnou návratnost balíčku Pokémon na svých vlastních datech. Návratnost investice do vlastní praxe.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* CoachVille brand */
+    --navy: #394A82;
+    --navy-dark: #2A3866;
+    --navy-light: #4F62A0;
+    --teal: #38C0C3;
+    --teal-dark: #2BA1A4;
+    --teal-light: #B3E8E9;
+    --gold: #BF933A;
+    --gold-light: #E8D29B;
+    --paper: #FAF9F5;       /* cream */
+    --paper-pure: #FFFFFF;
+    --ink: #30302E;
+    --ink-pure: #000000;
+    --muted: #6C757D;
+    --line: #E5E7EB;
+  }
+  * { font-family: 'Montserrat', sans-serif; }
+  body { background: var(--paper); color: var(--ink); }
+  h1, h2 { text-transform: uppercase; letter-spacing: -0.005em; line-height: 1.15; }
+  h3 { line-height: 1.25; }
+  .text-navy { color: var(--navy); }
+  .text-teal { color: var(--teal); }
+  .text-gold { color: var(--gold); }
+  .bg-navy { background-color: var(--navy); }
+  .bg-teal { background-color: var(--teal); }
+  .bg-gold { background-color: var(--gold); }
+  .bg-cream { background-color: var(--paper); }
+  .border-teal { border-color: var(--teal); }
+  .border-navy { border-color: var(--navy); }
+
+  /* Typographic helpers */
+  .gold-label {
+    color: var(--gold); text-transform: uppercase;
+    letter-spacing: 0.12em; font-weight: 600; font-size: 13px;
+  }
+  .nav-label {
+    color: var(--navy); text-transform: uppercase;
+    letter-spacing: 0.08em; font-weight: 700; font-size: 12px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background: var(--teal); color: white;
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: 0.06em; font-size: 14px;
+    padding: 18px 32px; border-radius: 999px;
+    transition: all .2s; display: inline-block;
+    text-align: center; cursor: pointer; border: none;
+    box-shadow: 0 4px 16px rgba(56,192,195,.3);
+  }
+  .btn-primary:hover { background: var(--teal-dark); transform: translateY(-2px); box-shadow: 0 6px 22px rgba(56,192,195,.4); }
+  .btn-secondary {
+    background: white; color: var(--navy);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: 0.06em; font-size: 13px;
+    padding: 14px 24px; border-radius: 999px;
+    border: 2px solid var(--navy); cursor: pointer; transition: all .2s;
+  }
+  .btn-secondary:hover { background: var(--navy); color: white; }
+  .btn-link {
+    color: var(--teal-dark); text-decoration: none; font-weight: 600;
+    font-size: 13px; padding: 10px 16px; background: white;
+    border: 1.5px dashed var(--teal); border-radius: 999px;
+    transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .btn-link:hover { background: var(--teal-light); border-style: solid; }
+
+  /* Cards */
+  .card {
+    background: var(--paper-pure); border-radius: 16px; padding: 28px;
+    box-shadow: 0 2px 16px rgba(57,74,130,.06); border: 1px solid var(--line);
+  }
+  .card-cream {
+    background: var(--paper); border-radius: 16px; padding: 28px;
+    border: 1px solid var(--line);
+  }
+
+  /* Package buttons */
+  .package-btn {
+    padding: 16px; border: 2px solid var(--line); border-radius: 12px;
+    cursor: pointer; transition: all .2s; background: white; text-align: center;
+  }
+  .package-btn:hover { border-color: var(--teal); }
+  .package-btn.selected { border-color: var(--teal); background: var(--teal-light); }
+
+  /* Sliders */
+  input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--teal-light); border-radius: 999px; outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; background: var(--teal); border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 10px rgba(56,192,195,.5); }
+  input[type=range]::-moz-range-thumb { width: 26px; height: 26px; background: var(--teal); border-radius: 50%; cursor: pointer; border: 3px solid white; }
+
+  /* Inputs */
+  .input-num {
+    padding: 12px 14px; border: 2px solid var(--line); border-radius: 10px;
+    font-size: 18px; font-weight: 700; outline: none; transition: all .2s;
+    width: 100px; text-align: center; background: white; color: var(--navy);
+    font-family: 'Montserrat', sans-serif;
+  }
+  .input-num:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(56,192,195,.15); }
+  .input-num.wide { width: 130px; }
+  .input-num.default-value { background: #FDF6E3; border-color: var(--gold-light); color: var(--gold); }
+  .input-num.user-edited { background: white; border-color: var(--teal); color: var(--navy); }
+  /* Hide spinner arrows */
+  .input-num::-webkit-outer-spin-button, .input-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .input-num[type=number] { -moz-appearance: textfield; }
+
+  /* Stage section */
+  .stage-section {
+    padding: 28px; background: white; border-radius: 16px;
+    border: 1px solid var(--line); margin-bottom: 16px;
+    box-shadow: 0 2px 16px rgba(57,74,130,.04);
+  }
+
+  /* Funnel rows - count-based */
+  .funnel-row {
+    display: grid; grid-template-columns: 1fr; gap: 12px;
+    padding: 18px; background: var(--paper); border-radius: 12px;
+    border-left: 4px solid var(--teal); margin-bottom: 8px;
+  }
+  @media (min-width: 768px) {
+    .funnel-row { grid-template-columns: 2fr 1.3fr 1fr; align-items: center; }
+  }
+  .funnel-step-label {
+    font-weight: 700; font-size: 15px; color: var(--navy);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .funnel-cell { display: flex; flex-direction: column; gap: 5px; }
+  .cell-label {
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; font-weight: 800; color: var(--muted);
+  }
+  .input-label-yellow { color: var(--gold); }
+  .input-label-teal { color: var(--teal-dark); }
+  .input-with-suffix { display: flex; align-items: center; gap: 8px; }
+  .calc-pct {
+    font-size: 22px; font-weight: 900; color: var(--teal-dark);
+    background: white; border: 1.5px dashed var(--teal-light);
+    border-radius: 8px; padding: 6px 12px; display: inline-block;
+    min-width: 70px; text-align: center;
+  }
+  .arrow-divider { text-align: center; color: var(--muted); font-size: 14px; padding: 4px 0; }
+
+  /* Close rows */
+  .close-row {
+    display: grid; grid-template-columns: 1fr; gap: 12px;
+    padding: 18px; border-radius: 12px; margin-bottom: 8px;
+  }
+  @media (min-width: 768px) {
+    .close-row { grid-template-columns: 1.5fr 1fr 1.4fr; align-items: center; }
+  }
+  .close-row.green { background: #ECFDF5; border-left: 4px solid #10B981; }
+  .close-row.amber { background: #FFFBEB; border-left: 4px solid var(--gold); }
+  .close-row.blue { background: #EFF6FF; border-left: 4px solid var(--navy); }
+
+  /* Badges */
+  .badge {
+    display: inline-block; padding: 5px 12px; border-radius: 999px;
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .badge-navy { background: var(--navy); color: white; }
+  .badge-teal { background: var(--teal); color: white; }
+  .badge-gold { background: var(--gold); color: white; }
+  .badge-cream { background: var(--paper); color: var(--navy); border: 1px solid var(--line); }
+
+  /* Live result blocks */
+  .live-result {
+    background: var(--paper); padding: 18px 22px;
+    border-radius: 12px; border-left: 4px solid var(--gold);
+  }
+
+  /* Number stat */
+  .stat-num {
+    font-size: 28px; font-weight: 900; color: var(--navy); line-height: 1.1;
+  }
+  .stat-num.teal { color: var(--teal-dark); }
+  .stat-num.gold { color: var(--gold); }
+
+  /* Hero number */
+  .hero-num {
+    font-size: 56px; font-weight: 900; color: var(--navy);
+    line-height: 1; letter-spacing: -0.02em;
+  }
+  @media (min-width: 768px) { .hero-num { font-size: 84px; } }
+
+  /* Scenario cards */
+  .scenario-card {
+    padding: 22px; border-radius: 14px; background: white;
+    border: 1px solid var(--line);
+  }
+  .scenario-card.pessimist { border-left: 4px solid #EF4444; }
+  .scenario-card.realist { border-left: 4px solid var(--teal); background: linear-gradient(135deg, var(--teal-light) 0%, white 80%); }
+  .scenario-card.optimist { border-left: 4px solid #10B981; }
+
+  /* Legend */
+  .legend-row {
+    display: flex; flex-wrap: wrap; gap: 14px; padding: 12px 16px;
+    background: var(--paper-pure); border: 1px solid var(--line);
+    border-radius: 12px; font-size: 12px; color: var(--muted);
+  }
+
+  /* Animations */
+  .fade-in { animation: fadeIn .6s ease-out; }
+  @keyframes fadeIn { from {opacity:0; transform: translateY(20px);} to {opacity:1; transform: translateY(0);} }
+
+  /* Mountain decoration (Inspirační prvek z brand manuálu) */
+  .mountain-decoration {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color: white; padding: 30px 28px; border-radius: 16px;
+    text-align: center; position: relative; overflow: hidden;
+  }
+
+  /* Multi-balíček scenario - premium / "casino" vibe */
+  .multi-pkg-section {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 50%, var(--navy) 100%);
+    border-radius: 24px; padding: 40px 32px; color: white;
+    position: relative; overflow: hidden; margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(57, 74, 130, 0.25);
+  }
+  .multi-pkg-section::before {
+    content: '★'; position: absolute; top: 20px; right: 24px;
+    color: var(--gold); font-size: 22px; opacity: 0.6;
+  }
+  .glass-panel {
+    background: rgba(255,255,255,0.08); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 16px;
+  }
+  .emphasize-slider { height: 14px !important; background: linear-gradient(to right, rgba(191,147,58,0.4), rgba(232,210,155,0.6)) !important; }
+  .emphasize-slider::-webkit-slider-thumb {
+    width: 36px !important; height: 36px !important;
+    background: var(--gold) !important; border: 4px solid white !important;
+    box-shadow: 0 0 24px rgba(191, 147, 58, 0.7) !important;
+  }
+  .emphasize-slider::-moz-range-thumb {
+    width: 36px !important; height: 36px !important;
+    background: var(--gold) !important; border: 4px solid white !important;
+  }
+  .quick-pkg-btn {
+    padding: 8px 14px; background: rgba(255,255,255,0.1); color: white;
+    border: 1px solid rgba(255,255,255,0.2); border-radius: 999px;
+    font-size: 11px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .quick-pkg-btn:hover, .quick-pkg-btn.active {
+    background: var(--gold); color: var(--navy); border-color: var(--gold);
+    transform: translateY(-1px); box-shadow: 0 4px 12px rgba(191,147,58,0.4);
+  }
+  .casino-stat {
+    background: rgba(255,255,255,0.12); backdrop-filter: blur(8px);
+    padding: 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s;
+  }
+  .bonus-cliffhanger {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    padding: 22px; border-radius: 16px; text-align: center; color: var(--navy);
+    box-shadow: 0 4px 20px rgba(191, 147, 58, 0.35);
+  }
+  .count-up { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- HEADER -->
+<header class="bg-white border-b border-gray-100 sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-baseline gap-1">
+      <span class="text-xl font-black" style="color: var(--teal); font-family: 'Montserrat'; letter-spacing: -0.02em;">Coach</span><span class="text-xl font-black" style="color: var(--navy); letter-spacing: -0.02em;">Ville</span>
+      <span class="text-xs font-semibold ml-1" style="color: var(--gold); letter-spacing: 0.15em;">EUROPE ★</span>
+    </div>
+    <a href="https://coachville.eu" class="nav-label hover:text-teal" style="text-decoration:none;">coachville.eu →</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="max-w-3xl mx-auto px-6 pt-14 pb-8 text-center">
+  <div class="gold-label mb-4">Kalkulačka návratnosti investice</div>
+  <h1 class="text-4xl md:text-5xl font-black mb-5 text-navy" style="font-weight: 900;">
+    Pokémon Strategy<br>kalkulačka
+  </h1>
+  <p class="text-lg text-gray-700 max-w-2xl mx-auto mb-3 leading-relaxed">
+    Spočítej si návratnost balíčku Pokémon — <strong>na svých vlastních číslech</strong>. Návratnost investice do vlastní praxe.
+  </p>
+  <p class="text-sm text-gray-500">
+    Tvoje data, tvoje hra, tvoje rostoucí praxe.
+  </p>
+</section>
+
+<!-- LEGEND -->
+<section class="max-w-4xl mx-auto px-6 mb-4">
+  <div class="legend-row">
+    <span><span class="badge" style="background:#FDF6E3; color: var(--gold); border: 1px solid var(--gold-light);">Žluté pole</span> = vstup s defaultem</span>
+    <span><span class="badge" style="background:white; color: var(--teal-dark); border: 1px solid var(--teal);">Bílé pole</span> = tvá vlastní data</span>
+    <span><span class="badge" style="background:white; color: var(--teal-dark); border: 1.5px dashed var(--teal-light);">Přerušovaný rámeček</span> = vypočtená hodnota</span>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="max-w-4xl mx-auto px-6 pb-16">
+
+  <!-- STAGE 1: Balíček -->
+  <div class="stage-section">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="badge badge-gold">Krok 1</span>
+      <h3 class="text-xl font-black text-navy" style="text-transform: uppercase;">Tvůj Pokémon balíček</h3>
+    </div>
+
+    <a href="https://form.simpleshop.cz/DkVB/buy/" target="_blank" rel="noopener noreferrer" class="btn-link mb-5 inline-flex items-center gap-2">
+      🔗 Zobrazit aktuální ceny balíčků →
+    </a>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <label class="block">
+        <span class="cell-label block mb-1">Cena balíčku</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="packagePrice" class="input-num wide" value="0" step="500" min="0">
+          <span class="text-sm text-gray-500">Kč</span>
+        </div>
+      </label>
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Nových kontaktů</span>
+        <input type="number" inputmode="numeric" id="contactsNew" class="input-num" value="0" step="1" min="0">
+      </label>
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Bonusových kontaktů</span>
+        <input type="number" inputmode="numeric" id="contactsBonus" class="input-num" value="0" step="1" min="0">
+      </label>
+    </div>
+    <div class="text-sm text-gray-600 mt-4">📞 <strong>Celkem kontaktů k navolání: <span id="contactsTotalDisplay" class="text-navy text-lg font-black">0</span></strong></div>
+  </div>
+
+  <!-- STAGE 2: Navolávání kontaktů -->
+  <div class="stage-section">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="badge badge-gold">Krok 2</span>
+      <h3 class="text-xl font-black text-navy" style="text-transform: uppercase;">Navolávání kontaktů</h3>
+    </div>
+    <p class="text-sm text-gray-600 mb-5">U každého kroku zadej <strong>počet lidí</strong>. Konverze v % se vypočítá automaticky.</p>
+
+    <!-- Krok 1: Pickup -->
+    <div class="funnel-row">
+      <div class="funnel-step-label">📞 Kontakt zvedne telefon</div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Počet lidí (zadej)</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="pickupCount" class="input-num" value="0" step="1" min="0">
+          <span class="text-sm text-gray-500">z <span id="pickupMax">0</span></span>
+        </div>
+      </div>
+      <div class="funnel-cell">
+        <span class="cell-label">Pickup rate</span>
+        <span class="calc-pct" id="pickupPct">0 %</span>
+      </div>
+    </div>
+    <div class="arrow-divider">↓</div>
+
+    <!-- Krok 2: Interest -->
+    <div class="funnel-row">
+      <div class="funnel-step-label">💬 Vyvolal jsem zájem / on projevil zájem (jakkoliv)</div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Počet lidí (zadej)</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="interestCount" class="input-num" value="0" step="1" min="0">
+          <span class="text-sm text-gray-500">z <span id="interestMax">0</span></span>
+        </div>
+      </div>
+      <div class="funnel-cell">
+        <span class="cell-label">Interest rate</span>
+        <span class="calc-pct" id="interestPct">0 %</span>
+      </div>
+    </div>
+    <div class="arrow-divider">↓</div>
+
+    <!-- Krok 3: Booking -->
+    <div class="funnel-row">
+      <div class="funnel-step-label">📅 <strong>Naplánováno strategických setkání</strong></div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Počet lidí (zadej)</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="bookedCount" class="input-num" value="0" step="1" min="0">
+          <span class="text-sm text-gray-500">z <span id="bookedMax">0</span></span>
+        </div>
+      </div>
+      <div class="funnel-cell">
+        <span class="cell-label">Booking rate</span>
+        <span class="calc-pct" id="bookedPct">0 %</span>
+      </div>
+    </div>
+    <div class="arrow-divider">↓</div>
+
+    <!-- Krok 4: Show-up -->
+    <div class="funnel-row">
+      <div class="funnel-step-label">✅ <strong>Kolik lidí dorazilo na domluvené setkání</strong></div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Počet lidí (zadej)</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="attendedCount" class="input-num" value="0" step="1" min="0">
+          <span class="text-sm text-gray-500">z <span id="attendedMax">0</span></span>
+        </div>
+      </div>
+      <div class="funnel-cell">
+        <span class="cell-label">Show-up rate</span>
+        <span class="calc-pct" id="attendedPct">0 %</span>
+      </div>
+    </div>
+
+    <div class="live-result mt-5">
+      <div class="cell-label mb-1">🤝 Realizovaných strategických setkání</div>
+      <div class="stat-num gold"><span id="totalMeetings">0</span></div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: Setkání → Hráči -->
+  <div class="stage-section">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="badge badge-gold">Krok 3</span>
+      <h3 class="text-xl font-black text-navy" style="text-transform: uppercase;">Strategická setkání → Platící hráči</h3>
+    </div>
+    <p class="text-sm text-gray-600 mb-5">Po balíčku víš přesné počty. Zadej je tady.</p>
+
+    <!-- ANO HNED -->
+    <div class="close-row green">
+      <div class="funnel-step-label">🟢 <strong>Ano hned</strong> <span class="text-xs text-gray-500 font-normal">(kupují na setkání)</span></div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Počet hráčů</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="anoHnedCount" class="input-num" value="0" step="1" min="0">
+          <span class="text-sm text-gray-500">z <span id="anoHnedMax">0</span></span>
+        </div>
+      </div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Vyfakturovaná částka celkem</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="anoHnedRevenue" class="input-num wide" value="0" step="500" min="0">
+          <span class="text-sm text-gray-500">Kč</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANO POZDĚJI - zájem -->
+    <div class="close-row amber">
+      <div class="funnel-step-label">🟡 <strong>Ano později</strong> <span class="text-xs text-gray-500 font-normal">(zájem, do 90 dnů)</span></div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Počet zájemců</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="anoPozdejiInterestCount" class="input-num" value="0" step="1" min="0">
+          <span class="text-sm text-gray-500">z <span id="anoPozdejiInterestMax">0</span></span>
+        </div>
+      </div>
+      <div class="funnel-cell">
+        <span class="cell-label">Realita</span>
+        <span class="text-xs text-gray-500">Ne všichni nakonec koupí. Zadej níže kolik koupilo:</span>
+      </div>
+    </div>
+
+    <!-- ANO POZDĚJI - konverze -->
+    <div class="close-row blue">
+      <div class="funnel-step-label">🔵 Z nich <strong>nakonec se stali hráči</strong></div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Počet nových hráčů</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="anoPozdejiConvertedCount" class="input-num" value="0" step="1" min="0">
+          <span class="text-sm text-gray-500">z <span id="anoPozdejiConvertedMax">0</span></span>
+        </div>
+      </div>
+      <div class="funnel-cell">
+        <span class="cell-label input-label-yellow">Vyfakturovaná částka celkem</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="anoPozdejiRevenue" class="input-num wide" value="0" step="500" min="0">
+          <span class="text-sm text-gray-500">Kč</span>
+        </div>
+        <span class="text-xs text-gray-400 mt-1">Auto-vyplní se podle počtu × cena sezóny</span>
+      </div>
+    </div>
+
+    <div class="live-result mt-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="cell-label mb-1">👥 Nových hráčů celkem</div>
+          <div class="stat-num gold"><span id="totalClients">0</span></div>
+        </div>
+        <div>
+          <div class="cell-label mb-1">💰 Vyfakturováno celkem</div>
+          <div class="stat-num gold"><span id="firstSeasonRevenue">0</span> Kč</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 4: Sezóna & prodloužení -->
+  <div class="stage-section">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="badge badge-gold">Krok 4</span>
+      <h3 class="text-xl font-black text-navy" style="text-transform: uppercase;">Prodloužení sezón</h3>
+    </div>
+    <p class="text-sm text-gray-600 mb-5">Sezóna = 12 setkání během 3 měsíců. Cena 6 000–72 000 Kč. Tady zadáš, jakou cenu očekáváš za <strong>další (prodlouženou) sezónu</strong>.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Cena další sezóny (pro prodloužení)</span>
+        <div class="input-with-suffix">
+          <input type="number" inputmode="numeric" id="seasonPrice" class="input-num wide" value="0" step="500" min="0" max="72000">
+          <span class="text-sm text-gray-500">Kč</span>
+        </div>
+        <span class="text-xs text-gray-400 mt-1 block">12 setkání / 3 měsíce, rozsah 6 000 – 72 000 Kč</span>
+      </label>
+    </div>
+
+    <div class="cell-label mb-2">Pravděpodobnost prodloužení po sezóně:</div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Po sezóně 1 → 2</span>
+        <div class="input-with-suffix"><input type="number" inputmode="numeric" id="ext1" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+      </label>
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Po sezóně 2 → 3</span>
+        <div class="input-with-suffix"><input type="number" inputmode="numeric" id="ext2" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+      </label>
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Po sezóně 3 → 4</span>
+        <div class="input-with-suffix"><input type="number" inputmode="numeric" id="ext3" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+      </label>
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Po sezóně 4 → 5</span>
+        <div class="input-with-suffix"><input type="number" inputmode="numeric" id="ext4" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+      </label>
+    </div>
+
+    <div class="live-result mt-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="cell-label mb-1">📅 ⌀ počet sezón na hráče</div>
+          <div class="stat-num gold"><span id="avgSeasons">1,00</span></div>
+        </div>
+        <div>
+          <div class="cell-label mb-1">💰 Příjem z prodloužení (12 měs)</div>
+          <div class="stat-num gold"><span id="extensionRevenue">0</span> Kč</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 5: Doporučení -->
+  <div class="stage-section">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="badge badge-gold">Krok 5</span>
+      <h3 class="text-xl font-black text-navy" style="text-transform: uppercase;">Doporučení od hráčů</h3>
+    </div>
+    <p class="text-sm text-gray-600 mb-5">Spokojený hráč přivede další hráče „zadarmo" — bez nákladů na navolávání.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Počet doporučení od stávajících hráčů</span>
+        <input type="number" inputmode="numeric" id="referralCount" class="input-num" value="0" min="0" step="1">
+        <span class="text-xs text-gray-400 mt-1 block">Auto-vyplní se z počtu hráčů; přepiš svým odhadem</span>
+      </label>
+      <label class="block">
+        <span class="cell-label input-label-yellow block mb-1">Konverze doporučení na hráče</span>
+        <div class="input-with-suffix"><input type="number" inputmode="numeric" id="referralCloseRate" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+      </label>
+    </div>
+
+    <div class="live-result mt-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="cell-label mb-1">🎁 Multiplier z doporučení</div>
+          <div class="stat-num gold">×<span id="referralMultiplier">1,00</span></div>
+        </div>
+        <div>
+          <div class="cell-label mb-1">💰 Příjem z doporučení</div>
+          <div class="stat-num gold"><span id="referralRevenue">0</span> Kč</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIG RESULT -->
+  <div class="card mb-6 text-center" style="background: linear-gradient(135deg, var(--paper) 0%, white 60%); border: 2px solid var(--teal);">
+    <div class="gold-label mb-3">Tvůj výsledek</div>
+    <p class="text-sm text-gray-600 mb-3">Z balíčku za <strong id="resultPackagePrice">12 000 Kč</strong> celkem vyfakturuješ:</p>
+    <div class="hero-num text-navy mb-2 fade-in" id="totalRevenue">0 Kč</div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 text-left">
+      <div class="bg-white p-4 rounded-xl border border-gray-100">
+        <div class="cell-label mb-1">Návratnost investice</div>
+        <div class="stat-num teal" id="roiX">0×</div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-gray-100">
+        <div class="cell-label mb-1">Profit</div>
+        <div class="stat-num teal" id="profit">0 Kč</div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-gray-100">
+        <div class="cell-label mb-1">Hráčů</div>
+        <div class="stat-num teal" id="clientsResult">0</div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-gray-100">
+        <div class="cell-label mb-1">Payback</div>
+        <div class="stat-num teal" id="paybackResult">- měsíc</div>
+      </div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gray-600">
+      <div>1. sezóna: <strong class="text-navy" id="breakdownFirst">0 Kč</strong></div>
+      <div>Prodloužení: <strong class="text-navy" id="breakdownExt">0 Kč</strong></div>
+      <div>Doporučení: <strong class="text-navy" id="breakdownRef">0 Kč</strong></div>
+    </div>
+  </div>
+
+  <!-- Sensitivity scenarios (přesunuto NAD multi-balíček) -->
+  <div class="card mb-6">
+    <div class="gold-label mb-2">Citlivostní analýza (±30 %)</div>
+    <h3 class="text-lg font-black text-navy mb-2" style="text-transform: uppercase;">Co když realita jednoho balíčku bude jiná?</h3>
+    <p class="text-xs text-gray-500 mb-4">Tvé reálné konverze a počty mohou být o 30 % nižší/vyšší. Toto je rozsah.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="scenario-card pessimist">
+        <div class="cell-label mb-1" style="color:#EF4444">−30 %</div>
+        <div class="stat-num" id="pessimistRevenue">0 Kč</div>
+        <div class="text-xs text-gray-500 mt-2"><span id="pessimistROI">0×</span> návratnost</div>
+      </div>
+      <div class="scenario-card realist">
+        <div class="cell-label mb-1 text-teal">⭐ Tvá data</div>
+        <div class="stat-num teal" id="realistRevenue">0 Kč</div>
+        <div class="text-xs text-gray-500 mt-2"><span id="realistROI">0×</span> návratnost</div>
+      </div>
+      <div class="scenario-card optimist">
+        <div class="cell-label mb-1" style="color:#10B981">+30 %</div>
+        <div class="stat-num" style="color:#10B981" id="optimistRevenue">0 Kč</div>
+        <div class="text-xs text-gray-500 mt-2"><span id="optimistROI">0×</span> návratnost</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MULTI-BALÍČEK SCENARIO (Pokemon scaling) - přesunuto POD sensitivity -->
+  <div class="multi-pkg-section">
+
+    <div class="text-center mb-7">
+      <div class="gold-label mb-3" style="color: var(--gold-light);">Multi-balíček scénář</div>
+      <h2 class="text-3xl md:text-5xl font-black mb-3 leading-tight" style="text-transform: uppercase;">
+        Co se stane, když budeš<br>takto hrát s více balíčky?
+      </h2>
+      <p class="text-base md:text-lg opacity-90 max-w-2xl mx-auto">
+        Posuň slider níže a uvidíš, jak se škálují tvá data, když si pořídíš víc balíčků v průběhu roku.
+      </p>
+    </div>
+
+    <!-- Slider input -->
+    <div class="glass-panel p-6 mb-6">
+      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <span class="gold-label" style="color: var(--gold-light); font-size: 13px;">Počet balíčků ročně</span>
+        <div class="flex items-baseline gap-3">
+          <span class="text-6xl md:text-7xl font-black leading-none count-up" style="color: var(--gold);" id="packagesPerYearDisplay">1</span>
+          <span class="opacity-70 text-sm">× / rok</span>
+        </div>
+      </div>
+      <input type="range" id="packagesPerYear" min="1" max="12" value="1" step="1" class="emphasize-slider">
+      <div class="flex justify-between text-xs mt-3 opacity-70 font-bold">
+        <span>1</span><span>3</span><span>6</span><span>9</span><span>12</span>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-5 justify-center">
+        <button class="quick-pkg-btn active" data-n="1">Jednorázově</button>
+        <button class="quick-pkg-btn" data-n="2">Pololetí</button>
+        <button class="quick-pkg-btn" data-n="4">Kvartálně</button>
+        <button class="quick-pkg-btn" data-n="6">Každé 2 měs</button>
+        <button class="quick-pkg-btn" data-n="12">Každý měsíc</button>
+      </div>
+    </div>
+
+    <!-- 4 Big stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div class="casino-stat">
+        <div class="gold-label mb-2" style="color: var(--gold-light); font-size: 11px;">Roční obrat</div>
+        <div class="text-2xl md:text-3xl font-black count-up" id="annualRevenueBig">0 Kč</div>
+      </div>
+      <div class="casino-stat">
+        <div class="gold-label mb-2" style="color: var(--gold-light); font-size: 11px;">Hráčů ročně</div>
+        <div class="text-2xl md:text-3xl font-black count-up" id="annualClientsBig">0</div>
+      </div>
+      <div class="casino-stat">
+        <div class="gold-label mb-2" style="color: var(--gold-light); font-size: 11px;">Roční profit</div>
+        <div class="text-2xl md:text-3xl font-black count-up" id="annualProfitBig">0 Kč</div>
+      </div>
+      <div class="casino-stat">
+        <div class="gold-label mb-2" style="color: var(--gold-light); font-size: 11px;">Návratnost</div>
+        <div class="text-2xl md:text-3xl font-black count-up" id="annualROIBig">0×</div>
+      </div>
+    </div>
+
+    <!-- Bonus vs 1 balíček -->
+    <div class="bonus-cliffhanger">
+      <div class="gold-label mb-2" style="color: var(--navy); opacity: 0.7; font-size: 11px;">Bonus oproti jednomu balíčku ročně</div>
+      <div class="text-3xl md:text-5xl font-black mb-1 count-up" id="bonusRevenueBig">+0 Kč</div>
+      <div class="text-sm font-semibold opacity-80">tj. <span id="bonusClientsBig">0</span> hráčů ročně navíc</div>
+    </div>
+
+    <!-- Motivational footer -->
+    <div class="text-center text-sm opacity-90 mt-7 italic px-4 max-w-2xl mx-auto leading-relaxed">
+      💡 <strong>Praxe dělá mistra.</strong> Kouči, kteří kupují balíčky <strong>3+ ročně</strong>, mají v průměru 2× vyšší konverze než jednorázoví hráči — víc telefonátů, lepší script, vyšší jistota při closingu. Každý další balíček = víc dat, víc dovedností, víc hráčů.
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card mb-6">
+    <div class="gold-label mb-2">12měsíční výhled</div>
+    <h3 class="text-lg font-black text-navy mb-1" style="text-transform: uppercase;">Tok výnosů v čase</h3>
+    <p class="text-sm text-gray-500 mb-4">Měsíce 1–2: voláš + setkání (žádný obrat). Měsíc 3+: první sezóny. Pak prodloužení a doporučení.</p>
+    <div style="position:relative;height:340px"><canvas id="revenueChart"></canvas></div>
+  </div>
+
+  <!-- Constraint Diagnosis -->
+  <div class="mountain-decoration mb-6">
+    <div class="gold-label mb-2" style="color: var(--gold-light);">Diagnóza tvého úzkého místa</div>
+    <h3 class="text-2xl font-black mb-3" style="text-transform: uppercase;" id="constraintTitle">—</h3>
+    <p class="mb-4 max-w-2xl mx-auto opacity-90" id="constraintDescription">—</p>
+    <div class="bg-white text-left rounded-xl p-5 max-w-2xl mx-auto" style="color: var(--ink);">
+      <div class="gold-label mb-2">Co teď trénovat</div>
+      <p class="text-sm" id="constraintAction">—</p>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="card text-center" style="background: linear-gradient(135deg, var(--paper) 0%, white 100%);">
+    <div class="gold-label mb-3">Tvůj příští tah</div>
+    <h3 class="text-2xl font-black mb-3 text-navy" style="text-transform: uppercase;" id="ctaHeadline">Vyber si další balíček</h3>
+    <p class="text-gray-700 max-w-xl mx-auto mb-6" id="ctaSubline">Tvá vlastní data ti ukázala, kde stojíš. Teď je čas to proměnit v akci.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a id="ctaPrimary" href="https://form.simpleshop.cz/DkVB/buy/" target="_blank" rel="noopener noreferrer" class="btn-primary">Vybrat a objednat další balíček →</a>
+      <button id="shareBtn" class="btn-secondary">🔗 Sdílet můj scénář</button>
+      <button id="resetBtn" class="btn-secondary">🔄 Reset</button>
+    </div>
+    <p class="text-xs text-gray-500 mt-5">Tvůj výsledek se ukládá do URL — můžeš ho sdílet nebo se vrátit později.</p>
+  </div>
+
+  <p class="text-center text-xs text-gray-400 mt-6 max-w-2xl mx-auto">
+    Defaulty jsou expertní odhady CoachVille komunity. Skutečné výsledky závisí na tvém úsilí, dovednostech a tržním momentu. Není to investiční ani finanční doporučení.
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-10" style="background: var(--ink); color: white;">
+  <div class="max-w-5xl mx-auto px-6 text-center">
+    <div class="flex items-baseline justify-center gap-1 mb-3">
+      <span class="text-lg font-black" style="color: var(--teal);">Coach</span><span class="text-lg font-black">Ville</span>
+      <span class="text-xs font-semibold ml-1" style="color: var(--gold); letter-spacing: 0.15em;">EUROPE ★</span>
+    </div>
+    <p class="text-xs opacity-70">Hraj v životě naplno, pomáhej lidem.</p>
+    <p class="text-xs opacity-50 mt-2">© 2026 CoachVille Europe &nbsp;•&nbsp; <a href="https://coachville.eu" class="hover:text-teal">coachville.eu</a></p>
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// POKÉMON ROI CALCULATOR — Count-based, on-brand, integers
+// ============================================================
+
+const INPUT_IDS = ['packagePrice','contactsNew','contactsBonus','pickupCount','interestCount','bookedCount','attendedCount','anoHnedCount','anoHnedRevenue','anoPozdejiInterestCount','anoPozdejiConvertedCount','anoPozdejiRevenue','seasonPrice','ext1','ext2','ext3','ext4','referralCount','referralCloseRate'];
+
+const userEdited = new Set();
+let packagesPerYearState = 1;  // Multi-balíček scenario state
+
+function getInputs() {
+  const v = {};
+  INPUT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    v[id] = parseFloat(el.value) || 0;
+  });
+  v.contactsTotal = Math.round(v.contactsNew) + Math.round(v.contactsBonus);
+  return v;
+}
+
+function calculate(inputs, scenarioMult = 1.0) {
+  // Stage 2: Counts (with scenario multiplier on counts)
+  const pickup = Math.round(inputs.pickupCount * scenarioMult);
+  const interest = Math.round(inputs.interestCount * scenarioMult);
+  const booked = Math.round(inputs.bookedCount * scenarioMult);
+  const attended = Math.round(inputs.attendedCount * scenarioMult);
+
+  // Stage 3: Counts (whole hráči, integer)
+  const anoHnedClients = Math.round(inputs.anoHnedCount * scenarioMult);
+  const anoHnedRev = inputs.anoHnedRevenue * scenarioMult;
+  const anoPozdejiConverted = Math.round(inputs.anoPozdejiConvertedCount * scenarioMult);
+  const anoPozdejiRev = inputs.anoPozdejiRevenue * scenarioMult;
+
+  const totalClients = anoHnedClients + anoPozdejiConverted;
+  const firstSeasonRevenue = anoHnedRev + anoPozdejiRev;
+  const avgFirstSeasonPrice = totalClients > 0 ? firstSeasonRevenue / totalClients : 0;
+
+  // Stage 4: Extensions
+  const e1 = inputs.ext1 / 100;
+  const e2 = inputs.ext2 / 100;
+  const e3 = inputs.ext3 / 100;
+  const e4 = inputs.ext4 / 100;
+  const avgSeasons = 1 + e1 + e1*e2 + e1*e2*e3 + e1*e2*e3*e4;
+  const extensionsPerClient = avgSeasons - 1;
+  const extensionRevenue = totalClients * extensionsPerClient * inputs.seasonPrice;
+
+  // Stage 5: Referrals (3-gen finite cascade)
+  // referralCount = absolute count of referrals from current batch
+  // Convert to per-client ratio for cascade math
+  const referralCount = Math.round(inputs.referralCount * scenarioMult);
+  const referralsPerClient = totalClients > 0 ? referralCount / totalClients : 0;
+  const x = Math.min(0.95, referralsPerClient * inputs.referralCloseRate / 100);
+  const referralMultiplier = 1 + x + x*x + x*x*x;
+  const newClientsFromReferrals = totalClients * (referralMultiplier - 1);
+  const refClientLTV = inputs.seasonPrice * avgSeasons;
+  const referralRevenue = newClientsFromReferrals * refClientLTV;
+
+  // TOTALS
+  const totalRevenue = firstSeasonRevenue + extensionRevenue + referralRevenue;
+  const profit = totalRevenue - inputs.packagePrice;
+  const roi = totalRevenue / Math.max(1, inputs.packagePrice);
+
+  // Auto-calculated percentages
+  const pickupPct = inputs.contactsTotal > 0 ? (pickup / inputs.contactsTotal * 100) : 0;
+  const interestPct = pickup > 0 ? (interest / pickup * 100) : 0;
+  const bookedPct = interest > 0 ? (booked / interest * 100) : 0;
+  const attendedPct = booked > 0 ? (attended / booked * 100) : 0;
+
+  return {
+    contactsTotal: inputs.contactsTotal,
+    pickup, interest, booked, attended,
+    pickupPct, interestPct, bookedPct, attendedPct,
+    anoHnedClients, anoHnedRev, anoPozdejiConverted, anoPozdejiRev,
+    totalClients, firstSeasonRevenue, avgFirstSeasonPrice,
+    avgSeasons, extensionRevenue,
+    referralMultiplier, newClientsFromReferrals, referralRevenue,
+    totalRevenue, profit, roi
+  };
+}
+
+function build12MonthTimeline(firstSeasonRev, extRev, refRev) {
+  const timeline = new Array(12).fill(0);
+  const firstShares = [0, 0, 0.40, 0.35, 0.20, 0.05, 0, 0, 0, 0, 0, 0];
+  const extShares = [0, 0, 0, 0, 0, 0.10, 0.18, 0.22, 0.20, 0.15, 0.10, 0.05];
+  const refShares = [0, 0, 0, 0, 0, 0, 0, 0.10, 0.20, 0.30, 0.25, 0.15];
+  for (let i = 0; i < 12; i++) {
+    timeline[i] = firstSeasonRev * firstShares[i] + extRev * extShares[i] + refRev * refShares[i];
+  }
+  return timeline;
+}
+
+function diagnose(inputs, result) {
+  const stages = [
+    { key: 'pickup', label: 'Pickup rate (zvedání telefonu)',
+      advice: 'Trénuj telefonáty 30 min denně, měň jednu věc týdně (otevírací větu, pauzu, otázku). Volej v různých časech.' },
+    { key: 'interest', label: 'Vzbuzení zájmu při hovoru',
+      advice: 'Pracuj na úvodu hovoru prvních 30 sekund. Používej skript, nevymýšlej to. Domluv si s parťákem praktikování roleplay přesně na tuto oblast. Umět zaujmout je dovednost kterou chceš trénovat. Nemluv o sobě, zeptej se na otázku klienta, čím dříve bude mluvit on o sobě, tím větší pravděpodobnost dalších fází.' },
+    { key: 'booking', label: 'Domluvení setkání',
+      advice: 'Dej dvě konkrétní možnosti termínu („úterý 14:00 nebo čtvrtek 10:00?"), kalendářový link a follow-up SMS. Domluvení = closing samo o sobě.' },
+    { key: 'showup', label: 'Show-up rate',
+      advice: 'Pošli připomínku 24 h a 1 h předem. Před setkáním krátkou „pre-game" otázku: co chceš ze setkání odnést. Buduj očekávání už před setkáním.' },
+    { key: 'close', label: 'Closing na strategickém setkání',
+      advice: 'Trénuj 5 nejčastějších námitek. Nahrávej setkání a poslouchej zpětně. Nauč se ticho po nabídce — ten kdo začne mluvit první, ztrácí.' }
+  ];
+
+  const baseRevenue = result.totalRevenue;
+  let biggest = null, biggestUplift = 0;
+
+  // Test improvements at each stage
+  ['pickup','interest','booking','showup'].forEach(key => {
+    const test = {...inputs};
+    if (key === 'pickup') test.pickupCount = Math.min(inputs.contactsTotal, Math.round(inputs.pickupCount * 1.4));
+    if (key === 'interest') test.interestCount = Math.min(test.pickupCount || inputs.pickupCount, Math.round(inputs.interestCount * 1.4));
+    if (key === 'booking') test.bookedCount = Math.min(test.interestCount || inputs.interestCount, Math.round(inputs.bookedCount * 1.4));
+    if (key === 'showup') test.attendedCount = Math.min(test.bookedCount || inputs.bookedCount, Math.round(inputs.attendedCount * 1.4));
+    const r = calculate(test, 1.0);
+    const uplift = r.totalRevenue - baseRevenue;
+    if (uplift > biggestUplift) {
+      biggestUplift = uplift;
+      biggest = stages.find(s => s.key === key);
+    }
+  });
+
+  // Test close
+  const closeTest = {...inputs};
+  closeTest.anoHnedCount = inputs.anoHnedCount + 1;
+  closeTest.anoHnedRevenue = inputs.anoHnedRevenue + inputs.seasonPrice;
+  closeTest.anoPozdejiConvertedCount = inputs.anoPozdejiConvertedCount + 1;
+  closeTest.anoPozdejiRevenue = inputs.anoPozdejiRevenue + inputs.seasonPrice;
+  const closeResult = calculate(closeTest, 1.0);
+  const closeUplift = closeResult.totalRevenue - baseRevenue;
+  if (closeUplift > biggestUplift) {
+    biggestUplift = closeUplift;
+    biggest = stages.find(s => s.key === 'close');
+  }
+
+  if (!biggest) biggest = stages[0];
+  return {
+    title: 'Tvé úzké místo: ' + biggest.label,
+    description: 'Pokud bys zlepšil/a tuto fázi, tvůj 12měsíční obrat z balíčku by se zvýšil o ' + fmtKc(biggestUplift) + '. Tady je tvá největší páka.',
+    action: biggest.advice
+  };
+}
+
+const fmtKc = n => Math.round(n).toLocaleString('cs-CZ').replace(/,/g, ' ') + ' Kč';
+const fmtNum = n => Math.round(n).toLocaleString('cs-CZ').replace(/,/g, ' ');
+const fmtInt = n => String(Math.round(n));
+const fmtPct = n => Math.round(n) + ' %';
+const fmt2 = n => (Math.round(n * 100) / 100).toFixed(2).replace('.', ',');
+
+// ----- Render
+let chart = null;
+function render() {
+  const inputs = getInputs();
+
+  // Update max constraints (cascading)
+  document.getElementById('pickupMax').textContent = inputs.contactsTotal;
+  document.getElementById('pickupCount').max = inputs.contactsTotal;
+
+  document.getElementById('interestMax').textContent = Math.round(inputs.pickupCount);
+  document.getElementById('interestCount').max = Math.round(inputs.pickupCount);
+
+  document.getElementById('bookedMax').textContent = Math.round(inputs.interestCount);
+  document.getElementById('bookedCount').max = Math.round(inputs.interestCount);
+
+  document.getElementById('attendedMax').textContent = Math.round(inputs.bookedCount);
+  document.getElementById('attendedCount').max = Math.round(inputs.bookedCount);
+
+  document.getElementById('anoHnedMax').textContent = Math.round(inputs.attendedCount);
+  document.getElementById('anoHnedCount').max = Math.round(inputs.attendedCount);
+
+  const anoPozdejiInterestMax = Math.max(0, Math.round(inputs.attendedCount) - Math.round(inputs.anoHnedCount));
+  document.getElementById('anoPozdejiInterestMax').textContent = anoPozdejiInterestMax;
+  document.getElementById('anoPozdejiInterestCount').max = anoPozdejiInterestMax;
+
+  document.getElementById('anoPozdejiConvertedMax').textContent = Math.round(inputs.anoPozdejiInterestCount);
+  document.getElementById('anoPozdejiConvertedCount').max = Math.round(inputs.anoPozdejiInterestCount);
+
+  // Cap input values to maxes (silent enforcement)
+  if (inputs.pickupCount > inputs.contactsTotal) { document.getElementById('pickupCount').value = inputs.contactsTotal; inputs.pickupCount = inputs.contactsTotal; }
+  if (inputs.interestCount > inputs.pickupCount) { document.getElementById('interestCount').value = Math.round(inputs.pickupCount); inputs.interestCount = inputs.pickupCount; }
+  if (inputs.bookedCount > inputs.interestCount) { document.getElementById('bookedCount').value = Math.round(inputs.interestCount); inputs.bookedCount = inputs.interestCount; }
+  if (inputs.attendedCount > inputs.bookedCount) { document.getElementById('attendedCount').value = Math.round(inputs.bookedCount); inputs.attendedCount = inputs.bookedCount; }
+  if (inputs.anoHnedCount > inputs.attendedCount) { document.getElementById('anoHnedCount').value = Math.round(inputs.attendedCount); inputs.anoHnedCount = inputs.attendedCount; }
+  if (inputs.anoPozdejiInterestCount > anoPozdejiInterestMax) { document.getElementById('anoPozdejiInterestCount').value = anoPozdejiInterestMax; inputs.anoPozdejiInterestCount = anoPozdejiInterestMax; }
+  if (inputs.anoPozdejiConvertedCount > inputs.anoPozdejiInterestCount) { document.getElementById('anoPozdejiConvertedCount').value = Math.round(inputs.anoPozdejiInterestCount); inputs.anoPozdejiConvertedCount = inputs.anoPozdejiInterestCount; }
+
+  const r = calculate(inputs, 1.0);
+  const rPess = calculate(inputs, 0.7);
+  const rOpt = calculate(inputs, 1.3);
+
+  // Stage 1
+  document.getElementById('contactsTotalDisplay').textContent = inputs.contactsTotal;
+
+  // Stage 2: percentage display
+  document.getElementById('pickupPct').textContent = fmtPct(r.pickupPct);
+  document.getElementById('interestPct').textContent = fmtPct(r.interestPct);
+  document.getElementById('bookedPct').textContent = fmtPct(r.bookedPct);
+  document.getElementById('attendedPct').textContent = fmtPct(r.attendedPct);
+  document.getElementById('totalMeetings').textContent = fmtInt(r.attended);
+
+  // Stage 3
+  document.getElementById('totalClients').textContent = fmtInt(r.totalClients);
+  document.getElementById('firstSeasonRevenue').textContent = fmtNum(r.firstSeasonRevenue);
+  // avgFirstSeasonPrice removed from UI (matoucí)
+
+  // Stage 4
+  document.getElementById('avgSeasons').textContent = fmt2(r.avgSeasons);
+  document.getElementById('extensionRevenue').textContent = fmtNum(r.extensionRevenue);
+
+  // Stage 5
+  document.getElementById('referralMultiplier').textContent = fmt2(r.referralMultiplier);
+  document.getElementById('referralRevenue').textContent = fmtNum(r.referralRevenue);
+
+  // Big result
+  document.getElementById('resultPackagePrice').textContent = fmtKc(inputs.packagePrice);
+  document.getElementById('totalRevenue').textContent = fmtKc(r.totalRevenue);
+  document.getElementById('roiX').textContent = fmt2(r.roi) + '×';
+  document.getElementById('profit').textContent = fmtKc(r.profit);
+  document.getElementById('clientsResult').textContent = fmtInt(r.totalClients);
+
+  document.getElementById('breakdownFirst').textContent = fmtKc(r.firstSeasonRevenue);
+  document.getElementById('breakdownExt').textContent = fmtKc(r.extensionRevenue);
+  document.getElementById('breakdownRef').textContent = fmtKc(r.referralRevenue);
+
+  // Payback
+  const tl = build12MonthTimeline(r.firstSeasonRevenue, r.extensionRevenue, r.referralRevenue);
+  let cum = 0, paybackM = null;
+  for (let i = 0; i < 12; i++) {
+    cum += tl[i];
+    if (cum >= inputs.packagePrice && paybackM === null) paybackM = i + 1;
+  }
+  document.getElementById('paybackResult').textContent = paybackM ? `měsíc ${paybackM}` : '> 12 měs';
+
+  // Scenarios
+  document.getElementById('pessimistRevenue').textContent = fmtKc(rPess.totalRevenue);
+  document.getElementById('pessimistROI').textContent = fmt2(rPess.roi) + '×';
+  document.getElementById('realistRevenue').textContent = fmtKc(r.totalRevenue);
+  document.getElementById('realistROI').textContent = fmt2(r.roi) + '×';
+  document.getElementById('optimistRevenue').textContent = fmtKc(rOpt.totalRevenue);
+  document.getElementById('optimistROI').textContent = fmt2(rOpt.roi) + '×';
+
+  // Diagnosis
+  const diag = diagnose(inputs, r);
+  document.getElementById('constraintTitle').textContent = diag.title;
+  document.getElementById('constraintDescription').textContent = diag.description;
+  document.getElementById('constraintAction').textContent = diag.action;
+
+  // CTA
+  let ctaHeadline = 'Vyber si další balíček';
+  let ctaSubline = 'Tvá vlastní data ti ukázala, kde stojíš. Teď je čas to proměnit v akci.';
+  let ctaUrl = 'https://form.simpleshop.cz/DkVB/buy/';
+  let ctaBtn = 'Vybrat a objednat další balíček';
+  if (r.roi < 1.0) {
+    ctaHeadline = 'Nejdřív investuj do dovedností';
+    ctaSubline = 'Tvá data ukazují, že balíček by ti aktuálně nepřinesl návratnost. Doporučujeme nejdřív investovat do tréninku obchodních dovedností.';
+    ctaUrl = 'https://coachville.eu/acc-vycvik';
+    ctaBtn = 'Vyzkoušet ACC výcvik';
+  } else if (r.roi >= 5) {
+    ctaHeadline = 'Další krok:';
+    ctaSubline = 'Tvé konverze ukazují, že máš dovednosti. Návratnost investice > 5× = scale fáze. Větší balíček = víc kontaktů = víc hráčů.';
+    ctaUrl = 'https://form.simpleshop.cz/DkVB/buy/';
+    ctaBtn = 'Vybrat a objednat další balíček';
+  }
+  document.getElementById('ctaHeadline').textContent = ctaHeadline;
+  document.getElementById('ctaSubline').textContent = ctaSubline;
+  const ctaP = document.getElementById('ctaPrimary');
+  ctaP.href = ctaUrl;
+  ctaP.textContent = ctaBtn + ' →';
+
+  // MULTI-BALÍČEK SCENARIO (linear scaling - honest math)
+  const n = packagesPerYearState;
+  const annualRevenue = r.totalRevenue * n;
+  const annualClients = r.totalClients * n;
+  const annualPackageCost = inputs.packagePrice * n;
+  const annualProfit = annualRevenue - annualPackageCost;
+  const annualROI = annualRevenue / Math.max(1, annualPackageCost);
+  const bonusRevenue = r.totalRevenue * (n - 1);
+  const bonusClients = r.totalClients * (n - 1);
+
+  document.getElementById('annualRevenueBig').textContent = fmtKc(annualRevenue);
+  document.getElementById('annualClientsBig').textContent = fmtInt(annualClients);
+  document.getElementById('annualProfitBig').textContent = fmtKc(annualProfit);
+  document.getElementById('annualROIBig').textContent = fmt2(annualROI) + '×';
+  document.getElementById('bonusRevenueBig').textContent = (bonusRevenue >= 0 ? '+' : '') + fmtKc(bonusRevenue);
+  document.getElementById('bonusClientsBig').textContent = fmtInt(bonusClients);
+  document.getElementById('packagesPerYearDisplay').textContent = n;
+
+  drawChart(rPess, r, rOpt, inputs.packagePrice);
+}
+
+function drawChart(rPess, rReal, rOpt, pkgPrice) {
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  if (chart) chart.destroy();
+  const cumul = arr => arr.reduce((acc, v, i) => { acc.push((acc[i-1] || 0) + v); return acc; }, []);
+  const labels = ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'];
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: '−30 %', data: cumul(build12MonthTimeline(rPess.firstSeasonRevenue, rPess.extensionRevenue, rPess.referralRevenue)), borderColor: '#EF4444', backgroundColor: 'rgba(239,68,68,.06)', tension: .3, fill: true, borderWidth: 2 },
+        { label: 'Tvá data', data: cumul(build12MonthTimeline(rReal.firstSeasonRevenue, rReal.extensionRevenue, rReal.referralRevenue)), borderColor: '#38C0C3', backgroundColor: 'rgba(56,192,195,.14)', tension: .3, fill: true, borderWidth: 3 },
+        { label: '+30 %', data: cumul(build12MonthTimeline(rOpt.firstSeasonRevenue, rOpt.extensionRevenue, rOpt.referralRevenue)), borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,.06)', tension: .3, fill: true, borderWidth: 2 },
+        { label: 'Cena balíčku (break-even)', data: labels.map(() => pkgPrice), borderColor: '#BF933A', borderDash: [6,4], borderWidth: 2, pointRadius: 0, fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, font: { size: 12, family: 'Montserrat' } } },
+        tooltip: { callbacks: { label: c => c.dataset.label + ': ' + fmtKc(c.parsed.y) } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => fmtKc(v), font: { family: 'Montserrat' } }, grid: { color: '#F3F4F6' } },
+        x: { grid: { display: false }, ticks: { font: { family: 'Montserrat' } } }
+      }
+    }
+  });
+}
+
+// ----- Wire up
+
+// Auto-sync dependent fields based on counts × seasonPrice
+// INVARIANT: count = 0 → revenue = 0 (always, even if user previously edited)
+// AUTO: count > 0 + revenue not user-edited → revenue = count × seasonPrice
+function syncDependents() {
+  const anoHnedCount = parseFloat(document.getElementById('anoHnedCount').value) || 0;
+  const anoPozdejiConvertedCount = parseFloat(document.getElementById('anoPozdejiConvertedCount').value) || 0;
+  const seasonPrice = parseFloat(document.getElementById('seasonPrice').value) || 0;
+  const totalClients = anoHnedCount + anoPozdejiConvertedCount;
+
+  // anoHnedRevenue
+  const ahrEl = document.getElementById('anoHnedRevenue');
+  if (anoHnedCount === 0) {
+    ahrEl.value = 0;
+    userEdited.delete('anoHnedRevenue');
+    ahrEl.classList.add('default-value');
+    ahrEl.classList.remove('user-edited');
+  } else if (!userEdited.has('anoHnedRevenue')) {
+    ahrEl.value = Math.round(anoHnedCount * seasonPrice);
+  }
+
+  // anoPozdejiRevenue
+  const aprEl = document.getElementById('anoPozdejiRevenue');
+  if (anoPozdejiConvertedCount === 0) {
+    aprEl.value = 0;
+    userEdited.delete('anoPozdejiRevenue');
+    aprEl.classList.add('default-value');
+    aprEl.classList.remove('user-edited');
+  } else if (!userEdited.has('anoPozdejiRevenue')) {
+    aprEl.value = Math.round(anoPozdejiConvertedCount * seasonPrice);
+  }
+
+  // referralCount: invariant + auto (no clients = no referrals)
+  const rcEl = document.getElementById('referralCount');
+  if (totalClients === 0) {
+    rcEl.value = 0;
+    userEdited.delete('referralCount');
+    rcEl.classList.add('default-value');
+    rcEl.classList.remove('user-edited');
+  } else if (!userEdited.has('referralCount')) {
+    rcEl.value = Math.max(0, Math.round(totalClients * 0.4));
+  }
+}
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  // Reset všech vstupů na 0
+  INPUT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    el.value = 0;
+    el.classList.remove('default-value', 'user-edited');
+  });
+  userEdited.clear();
+  packagesPerYearState = 1;
+  document.getElementById('packagesPerYear').value = 1;
+  document.querySelectorAll('.quick-pkg-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === 1));
+  render();
+});
+
+INPUT_IDS.forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    if (!userEdited.has(id)) {
+      userEdited.add(id);
+      el.classList.remove('default-value');
+      el.classList.add('user-edited');
+    }
+    syncDependents();
+    render();
+  });
+});
+
+
+// Multi-balíček slider + quick presets
+const packagesSlider = document.getElementById('packagesPerYear');
+packagesSlider.addEventListener('input', () => {
+  packagesPerYearState = parseInt(packagesSlider.value);
+  document.querySelectorAll('.quick-pkg-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.n) === packagesPerYearState);
+  });
+  render();
+});
+document.querySelectorAll('.quick-pkg-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    packagesPerYearState = parseInt(btn.dataset.n);
+    packagesSlider.value = packagesPerYearState;
+    packagesSlider.dispatchEvent(new Event('input'));
+  });
+});
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const params = new URLSearchParams();
+  INPUT_IDS.forEach(id => params.set(id, document.getElementById(id).value));
+  params.set('n', packagesPerYearState);
+  const url = window.location.origin + window.location.pathname + '?' + params.toString();
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('shareBtn');
+    btn.textContent = '✅ Zkopírováno!';
+    setTimeout(() => btn.textContent = '🔗 Sdílet můj scénář', 2500);
+  });
+});
+
+(function loadFromURL() {
+  const p = new URLSearchParams(window.location.search);
+  INPUT_IDS.forEach(id => {
+    if (p.get(id) !== null) {
+      document.getElementById(id).value = p.get(id);
+      userEdited.add(id);
+      const el = document.getElementById(id);
+      el.classList.add('user-edited');
+      el.classList.remove('default-value');
+    }
+  });
+  if (p.get('n')) {
+    packagesPerYearState = parseInt(p.get('n')) || 1;
+    document.getElementById('packagesPerYear').value = packagesPerYearState;
+    document.querySelectorAll('.quick-pkg-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === packagesPerYearState));
+  }
+})();
+
+syncDependents();
+render();
+</script>
+</body>
+</html>
