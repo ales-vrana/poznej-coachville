@@ -359,7 +359,7 @@
         </div>
       </div>
       <div class="funnel-cell">
-        <span class="cell-label">Pickup rate</span>
+        <span class="cell-label">Konverze (% zvednutí)</span>
         <span class="calc-pct" id="pickupPct">0 %</span>
       </div>
     </div>
@@ -376,7 +376,7 @@
         </div>
       </div>
       <div class="funnel-cell">
-        <span class="cell-label">Interest rate</span>
+        <span class="cell-label">Konverze (% zájmu)</span>
         <span class="calc-pct" id="interestPct">0 %</span>
       </div>
     </div>
@@ -393,7 +393,7 @@
         </div>
       </div>
       <div class="funnel-cell">
-        <span class="cell-label">Booking rate</span>
+        <span class="cell-label">Konverze (% domluvení)</span>
         <span class="calc-pct" id="bookedPct">0 %</span>
       </div>
     </div>
@@ -410,7 +410,7 @@
         </div>
       </div>
       <div class="funnel-cell">
-        <span class="cell-label">Show-up rate</span>
+        <span class="cell-label">Konverze (% účasti)</span>
         <span class="calc-pct" id="attendedPct">0 %</span>
       </div>
     </div>
@@ -513,28 +513,33 @@
           <input type="number" inputmode="numeric" id="seasonPrice" class="input-num wide" value="0" step="500" min="0" max="72000">
           <span class="text-sm text-gray-500">Kč</span>
         </div>
-        <span class="text-xs text-gray-400 mt-1 block">12 setkání / 3 měsíce, rozsah 6 000 – 72 000 Kč</span>
+        <span class="text-xs text-gray-400 mt-1 block">12 setkání / 3 měsíce, rozsah 6 000 – 72 000 Kč &nbsp;•&nbsp; 💡 Typicky 12 000 – 18 000 Kč</span>
       </label>
     </div>
 
-    <div class="cell-label mb-2">Pravděpodobnost prodloužení po sezóně:</div>
+    <div class="cell-label mb-1">Pravděpodobnost prodloužení po sezóně:</div>
+    <div class="text-xs text-gray-500 mb-3">💡 <strong>Tip:</strong> Retence typicky klesá s každou další sezónou. Pokud nemáš svá data, začni s odhadem podle reality svých klientů.</div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
       <label class="block">
         <span class="cell-label input-label-yellow block mb-1">Po sezóně 1 → 2</span>
         <div class="input-with-suffix"><input type="number" inputmode="numeric" id="ext1" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+        <span class="text-xs text-gray-400 mt-1 block">Typicky 50–70 %</span>
       </label>
       <label class="block">
         <span class="cell-label input-label-yellow block mb-1">Po sezóně 2 → 3</span>
         <div class="input-with-suffix"><input type="number" inputmode="numeric" id="ext2" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+        <span class="text-xs text-gray-400 mt-1 block">Typicky 40–60 %</span>
       </label>
       <label class="block">
         <span class="cell-label input-label-yellow block mb-1">Po sezóně 3 → 4</span>
         <div class="input-with-suffix"><input type="number" inputmode="numeric" id="ext3" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+        <span class="text-xs text-gray-400 mt-1 block">Typicky 30–50 %</span>
       </label>
       <label class="block">
         <span class="cell-label input-label-yellow block mb-1">Po sezóně 4 → 5</span>
         <div class="input-with-suffix"><input type="number" inputmode="numeric" id="ext4" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+        <span class="text-xs text-gray-400 mt-1 block">Typicky 20–40 %</span>
       </label>
     </div>
 
@@ -564,11 +569,12 @@
       <label class="block">
         <span class="cell-label input-label-yellow block mb-1">Počet doporučení od stávajících hráčů</span>
         <input type="number" inputmode="numeric" id="referralCount" class="input-num" value="0" min="0" step="1">
-        <span class="text-xs text-gray-400 mt-1 block">Auto-vyplní se z počtu hráčů; přepiš svým odhadem</span>
+        <span class="text-xs text-gray-400 mt-1 block">💡 Typicky 0,3–0,5 doporučení na 1 spokojeného hráče (tj. ze 4 hráčů ~1–2 doporučení)</span>
       </label>
       <label class="block">
         <span class="cell-label input-label-yellow block mb-1">Konverze doporučení na hráče</span>
         <div class="input-with-suffix"><input type="number" inputmode="numeric" id="referralCloseRate" class="input-num" value="0" step="1" min="0" max="100"><span class="text-sm text-gray-500">%</span></div>
+        <span class="text-xs text-gray-400 mt-1 block">💡 Doporučení je teplý kontakt - typicky 60–80 % konverze (víc než cold call)</span>
       </label>
     </div>
 
@@ -620,12 +626,12 @@
 
   <!-- Sensitivity scenarios (přesunuto NAD multi-balíček) -->
   <div class="card mb-6">
-    <div class="gold-label mb-2">Citlivostní analýza (±30 %)</div>
+    <div class="gold-label mb-2">Citlivostní analýza</div>
     <h3 class="text-lg font-black text-navy mb-2" style="text-transform: uppercase;">Co když realita jednoho balíčku bude jiná?</h3>
-    <p class="text-xs text-gray-500 mb-4">Tvé reálné konverze a počty mohou být o 30 % nižší/vyšší. Toto je rozsah.</p>
+    <p class="text-xs text-gray-500 mb-4">Tvé reálné výsledky mohou být drobně horší nebo lepší než zadané. Toto ukazuje rozsah při škálování tvých vstupů 0,7× (horší den) a 1,3× (lepší den).</p>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
       <div class="scenario-card pessimist">
-        <div class="cell-label mb-1" style="color:#EF4444">−30 %</div>
+        <div class="cell-label mb-1" style="color:#EF4444">Horší den (0,7×)</div>
         <div class="stat-num" id="pessimistRevenue">0 Kč</div>
         <div class="text-xs text-gray-500 mt-2"><span id="pessimistROI">0×</span> návratnost</div>
       </div>
@@ -635,7 +641,7 @@
         <div class="text-xs text-gray-500 mt-2"><span id="realistROI">0×</span> návratnost</div>
       </div>
       <div class="scenario-card optimist">
-        <div class="cell-label mb-1" style="color:#10B981">+30 %</div>
+        <div class="cell-label mb-1" style="color:#10B981">Lepší den (1,3×)</div>
         <div class="stat-num" style="color:#10B981" id="optimistRevenue">0 Kč</div>
         <div class="text-xs text-gray-500 mt-2"><span id="optimistROI">0×</span> návratnost</div>
       </div>
@@ -651,7 +657,7 @@
         Co se stane, když budeš<br>takto hrát s více balíčky?
       </h2>
       <p class="text-base md:text-lg opacity-90 max-w-2xl mx-auto">
-        Posuň slider níže a uvidíš, jak se škálují tvá data, když si pořídíš víc balíčků v průběhu roku.
+        Posuň posuvník níže a uvidíš, jak se škálují tvá data, když si pořídíš víc balíčků v průběhu roku.
       </p>
     </div>
 
@@ -706,7 +712,7 @@
 
     <!-- Motivational footer -->
     <div class="text-center text-sm opacity-90 mt-7 italic px-4 max-w-2xl mx-auto leading-relaxed">
-      💡 <strong>Praxe dělá mistra.</strong> Kouči, kteří kupují balíčky <strong>3+ ročně</strong>, mají v průměru 2× vyšší konverze než jednorázoví hráči — víc telefonátů, lepší script, vyšší jistota při closingu. Každý další balíček = víc dat, víc dovedností, víc hráčů.
+      💡 <strong>Praxe dělá mistra.</strong> Kouči, kteří kupují balíčky <strong>3+ ročně</strong>, mají v průměru 2× vyšší konverze než jednorázoví hráči — víc telefonátů, lepší skript, vyšší jistota při uzavírání obchodu. Každý další balíček = víc dat, víc dovedností, víc hráčů.
     </div>
   </div>
 
@@ -769,17 +775,50 @@ const INPUT_IDS = ['packagePrice','contactsNew','contactsBonus','pickupCount','i
 const userEdited = new Set();
 let packagesPerYearState = 1;  // Multi-balíček scenario state
 
+// QA Round 4 FIX: Bug #2 + #4 + #8 - input validation/clamping
+const INT_INPUTS = new Set(['contactsNew','contactsBonus','pickupCount','interestCount','bookedCount','attendedCount','anoHnedCount','anoPozdejiInterestCount','anoPozdejiConvertedCount','referralCount','ext1','ext2','ext3','ext4','referralCloseRate']);
+const PCT_INPUTS = new Set(['ext1','ext2','ext3','ext4','referralCloseRate']);
+
 function getInputs() {
   const v = {};
   INPUT_IDS.forEach(id => {
     const el = document.getElementById(id);
-    v[id] = parseFloat(el.value) || 0;
+    let raw = parseFloat(el.value);
+    if (isNaN(raw)) raw = 0;
+    raw = Math.max(0, raw);                              // Bug #2: no negative
+    if (PCT_INPUTS.has(id)) raw = Math.min(100, raw);    // Bug #4: % capped 0-100
+    if (id === 'seasonPrice') raw = Math.min(72000, raw); // Bug #4: max sezóna 72k
+    if (INT_INPUTS.has(id)) raw = Math.round(raw);        // Bug #8: force integer
+    v[id] = raw;
   });
-  v.contactsTotal = Math.round(v.contactsNew) + Math.round(v.contactsBonus);
+  v.contactsTotal = v.contactsNew + v.contactsBonus;
   return v;
 }
 
 function calculate(inputs, scenarioMult = 1.0) {
+  // QA Round 4 FIX: Defense in depth - clamp inputs at math boundary
+  // Even if getInputs() is bypassed (shared URL, DevTools, recursive calls), math is safe
+  const clampPct = (v) => Math.max(0, Math.min(100, v || 0));
+  inputs = {
+    packagePrice: Math.max(0, inputs.packagePrice || 0),
+    contactsNew: Math.max(0, Math.round(inputs.contactsNew || 0)),
+    contactsBonus: Math.max(0, Math.round(inputs.contactsBonus || 0)),
+    contactsTotal: inputs.contactsTotal !== undefined ? Math.max(0, inputs.contactsTotal) : (Math.max(0, Math.round(inputs.contactsNew||0)) + Math.max(0, Math.round(inputs.contactsBonus||0))),
+    pickupCount: Math.max(0, Math.round(inputs.pickupCount || 0)),
+    interestCount: Math.max(0, Math.round(inputs.interestCount || 0)),
+    bookedCount: Math.max(0, Math.round(inputs.bookedCount || 0)),
+    attendedCount: Math.max(0, Math.round(inputs.attendedCount || 0)),
+    anoHnedCount: Math.max(0, Math.round(inputs.anoHnedCount || 0)),
+    anoHnedRevenue: Math.max(0, inputs.anoHnedRevenue || 0),
+    anoPozdejiInterestCount: Math.max(0, Math.round(inputs.anoPozdejiInterestCount || 0)),
+    anoPozdejiConvertedCount: Math.max(0, Math.round(inputs.anoPozdejiConvertedCount || 0)),
+    anoPozdejiRevenue: Math.max(0, inputs.anoPozdejiRevenue || 0),
+    seasonPrice: Math.min(72000, Math.max(0, inputs.seasonPrice || 0)),
+    ext1: clampPct(inputs.ext1), ext2: clampPct(inputs.ext2), ext3: clampPct(inputs.ext3), ext4: clampPct(inputs.ext4),
+    referralCount: Math.max(0, Math.round(inputs.referralCount || 0)),
+    referralCloseRate: clampPct(inputs.referralCloseRate)
+  };
+
   // Stage 2: Counts (with scenario multiplier on counts)
   const pickup = Math.round(inputs.pickupCount * scenarioMult);
   const interest = Math.round(inputs.interestCount * scenarioMult);
@@ -788,9 +827,10 @@ function calculate(inputs, scenarioMult = 1.0) {
 
   // Stage 3: Counts (whole hráči, integer)
   const anoHnedClients = Math.round(inputs.anoHnedCount * scenarioMult);
-  const anoHnedRev = inputs.anoHnedRevenue * scenarioMult;
+  // Bug #6 FIX: orphan revenue - když počet=0, revenue MUSÍ být 0 (i kdyby data corrupt)
+  const anoHnedRev = anoHnedClients > 0 ? inputs.anoHnedRevenue * scenarioMult : 0;
   const anoPozdejiConverted = Math.round(inputs.anoPozdejiConvertedCount * scenarioMult);
-  const anoPozdejiRev = inputs.anoPozdejiRevenue * scenarioMult;
+  const anoPozdejiRev = anoPozdejiConverted > 0 ? inputs.anoPozdejiRevenue * scenarioMult : 0;
 
   const totalClients = anoHnedClients + anoPozdejiConverted;
   const firstSeasonRevenue = anoHnedRev + anoPozdejiRev;
@@ -819,7 +859,8 @@ function calculate(inputs, scenarioMult = 1.0) {
   // TOTALS
   const totalRevenue = firstSeasonRevenue + extensionRevenue + referralRevenue;
   const profit = totalRevenue - inputs.packagePrice;
-  const roi = totalRevenue / Math.max(1, inputs.packagePrice);
+  // Bug #3 FIX: When packagePrice=0, ROI is undefined (return null, not 12000×)
+  const roi = inputs.packagePrice > 0 ? totalRevenue / inputs.packagePrice : null;
 
   // Auto-calculated percentages
   const pickupPct = inputs.contactsTotal > 0 ? (pickup / inputs.contactsTotal * 100) : 0;
@@ -850,56 +891,101 @@ function build12MonthTimeline(firstSeasonRev, extRev, refRev) {
   return timeline;
 }
 
+// QA Round 4 FIX: Bug #1 - rate-based diagnose with funnel propagation.
+// Previously biased toward "Closing" because funnel stages didn't propagate uplift.
+// Now: identifies stage with biggest gap below target rate, simulates funnel propagation.
 function diagnose(inputs, result) {
   const stages = [
-    { key: 'pickup', label: 'Pickup rate (zvedání telefonu)',
+    { key: 'pickup', label: 'Zvedání telefonu', target: 0.40,
       advice: 'Trénuj telefonáty 30 min denně, měň jednu věc týdně (otevírací větu, pauzu, otázku). Volej v různých časech.' },
-    { key: 'interest', label: 'Vzbuzení zájmu při hovoru',
+    { key: 'interest', label: 'Vzbuzení zájmu při hovoru', target: 0.40,
       advice: 'Pracuj na úvodu hovoru prvních 30 sekund. Používej skript, nevymýšlej to. Domluv si s parťákem praktikování roleplay přesně na tuto oblast. Umět zaujmout je dovednost kterou chceš trénovat. Nemluv o sobě, zeptej se na otázku klienta, čím dříve bude mluvit on o sobě, tím větší pravděpodobnost dalších fází.' },
-    { key: 'booking', label: 'Domluvení setkání',
-      advice: 'Dej dvě konkrétní možnosti termínu („úterý 14:00 nebo čtvrtek 10:00?"), kalendářový link a follow-up SMS. Domluvení = closing samo o sobě.' },
-    { key: 'showup', label: 'Show-up rate',
+    { key: 'booking', label: 'Domluvení setkání', target: 0.65,
+      advice: 'Dej dvě konkrétní možnosti termínu („úterý 14:00 nebo čtvrtek 10:00?"), kalendářový odkaz a follow-up SMS. Domluvení = uzavření samo o sobě.' },
+    { key: 'showup', label: 'Účast na setkání', target: 0.70,
       advice: 'Pošli připomínku 24 h a 1 h předem. Před setkáním krátkou „pre-game" otázku: co chceš ze setkání odnést. Buduj očekávání už před setkáním.' },
-    { key: 'close', label: 'Closing na strategickém setkání',
+    { key: 'close', label: 'Uzavření obchodu na strategickém setkání', target: 0.30,
       advice: 'Trénuj 5 nejčastějších námitek. Nahrávej setkání a poslouchej zpětně. Nauč se ticho po nabídce — ten kdo začne mluvit první, ztrácí.' }
   ];
 
-  const baseRevenue = result.totalRevenue;
-  let biggest = null, biggestUplift = 0;
+  // Empty state guard
+  if (inputs.contactsTotal === 0 || (result.totalClients === 0 && inputs.attendedCount === 0)) {
+    return {
+      title: 'Doplň svá data pro diagnostiku',
+      description: 'Vyplň kroky 1-3 výše a kalkulačka identifikuje tvé úzké místo ve funnelu.',
+      action: 'Začni v Kroku 1 zadáním ceny balíčku a počtu kontaktů. Pak procházej krok po kroku.'
+    };
+  }
 
-  // Test improvements at each stage
-  ['pickup','interest','booking','showup'].forEach(key => {
-    const test = {...inputs};
-    if (key === 'pickup') test.pickupCount = Math.min(inputs.contactsTotal, Math.round(inputs.pickupCount * 1.4));
-    if (key === 'interest') test.interestCount = Math.min(test.pickupCount || inputs.pickupCount, Math.round(inputs.interestCount * 1.4));
-    if (key === 'booking') test.bookedCount = Math.min(test.interestCount || inputs.interestCount, Math.round(inputs.bookedCount * 1.4));
-    if (key === 'showup') test.attendedCount = Math.min(test.bookedCount || inputs.bookedCount, Math.round(inputs.attendedCount * 1.4));
-    const r = calculate(test, 1.0);
-    const uplift = r.totalRevenue - baseRevenue;
-    if (uplift > biggestUplift) {
-      biggestUplift = uplift;
-      biggest = stages.find(s => s.key === key);
+  // Current conversion rates
+  const rates = {
+    pickup: inputs.contactsTotal > 0 ? inputs.pickupCount / inputs.contactsTotal : 0,
+    interest: inputs.pickupCount > 0 ? inputs.interestCount / inputs.pickupCount : 0,
+    booking: inputs.interestCount > 0 ? inputs.bookedCount / inputs.interestCount : 0,
+    showup: inputs.bookedCount > 0 ? inputs.attendedCount / inputs.bookedCount : 0,
+    close: inputs.attendedCount > 0 ? (inputs.anoHnedCount + inputs.anoPozdejiConvertedCount) / inputs.attendedCount : 0
+  };
+
+  // Simulate uplift if one stage's rate improved to target (with funnel propagation)
+  function simulateUplift(stageKey) {
+    const improvedRates = {...rates};
+    const target = stages.find(s => s.key === stageKey).target;
+    improvedRates[stageKey] = Math.max(rates[stageKey], target);
+    const newPickup = Math.round(inputs.contactsTotal * improvedRates.pickup);
+    const newInterest = Math.round(newPickup * improvedRates.interest);
+    const newBooked = Math.round(newInterest * improvedRates.booking);
+    const newAttended = Math.round(newBooked * improvedRates.showup);
+    const newClients = Math.round(newAttended * improvedRates.close);
+    const avgRevPerClient = result.totalClients > 0
+      ? result.firstSeasonRevenue / result.totalClients
+      : (inputs.seasonPrice || 12000);
+    const newFirstSeasonRev = newClients * avgRevPerClient;
+    const testInputs = {...inputs,
+      pickupCount: newPickup, interestCount: newInterest, bookedCount: newBooked, attendedCount: newAttended,
+      anoHnedCount: newClients, anoHnedRevenue: newFirstSeasonRev,
+      anoPozdejiInterestCount: 0, anoPozdejiConvertedCount: 0, anoPozdejiRevenue: 0
+    };
+    return calculate(testInputs, 1.0).totalRevenue;
+  }
+
+  // Find stage with biggest gap below target
+  let weakest = null;
+  let biggestGap = 0;
+  stages.forEach(s => {
+    const r = rates[s.key];
+    if (r >= 0 && r < s.target) {
+      const gap = s.target - r;
+      if (gap > biggestGap) {
+        biggestGap = gap;
+        weakest = s;
+      }
     }
   });
 
-  // Test close
-  const closeTest = {...inputs};
-  closeTest.anoHnedCount = inputs.anoHnedCount + 1;
-  closeTest.anoHnedRevenue = inputs.anoHnedRevenue + inputs.seasonPrice;
-  closeTest.anoPozdejiConvertedCount = inputs.anoPozdejiConvertedCount + 1;
-  closeTest.anoPozdejiRevenue = inputs.anoPozdejiRevenue + inputs.seasonPrice;
-  const closeResult = calculate(closeTest, 1.0);
-  const closeUplift = closeResult.totalRevenue - baseRevenue;
-  if (closeUplift > biggestUplift) {
-    biggestUplift = closeUplift;
-    biggest = stages.find(s => s.key === 'close');
+  // Fallback: if all rates at/above target, find absolutely lowest stage
+  if (!weakest) {
+    let minRate = Infinity;
+    stages.forEach(s => {
+      if (rates[s.key] >= 0 && rates[s.key] < minRate) {
+        minRate = rates[s.key];
+        weakest = s;
+      }
+    });
   }
+  if (!weakest) weakest = stages[0];
 
-  if (!biggest) biggest = stages[0];
+  const currentRate = rates[weakest.key];
+  const uplift = simulateUplift(weakest.key) - result.totalRevenue;
+  const currentPct = Math.round(currentRate * 100);
+  const targetPct = Math.round(weakest.target * 100);
+  const description = uplift > 0
+    ? 'Aktuální konverze: ' + currentPct + ' %. Cílová: ' + targetPct + ' %. Pokud bys zlepšil/a tuto fázi na cíl, tvůj obrat by se zvýšil o ' + fmtKc(uplift) + '.'
+    : 'Aktuální konverze: ' + currentPct + ' % (nad cílem ' + targetPct + ' %). Tady jsi v dobré formě - pokračuj v ostatních fázích nebo přidávej balíčky.';
+
   return {
-    title: 'Tvé úzké místo: ' + biggest.label,
-    description: 'Pokud bys zlepšil/a tuto fázi, tvůj 12měsíční obrat z balíčku by se zvýšil o ' + fmtKc(biggestUplift) + '. Tady je tvá největší páka.',
-    action: biggest.advice
+    title: 'Tvé úzké místo: ' + weakest.label,
+    description: description,
+    action: weakest.advice
   };
 }
 
@@ -976,7 +1062,8 @@ function render() {
   // Big result
   document.getElementById('resultPackagePrice').textContent = fmtKc(inputs.packagePrice);
   document.getElementById('totalRevenue').textContent = fmtKc(r.totalRevenue);
-  document.getElementById('roiX').textContent = fmt2(r.roi) + '×';
+  // Bug #3 FIX: Show "—" when ROI undefined (packagePrice=0)
+  document.getElementById('roiX').textContent = r.roi !== null ? fmt2(r.roi) + '×' : '—';
   document.getElementById('profit').textContent = fmtKc(r.profit);
   document.getElementById('clientsResult').textContent = fmtInt(r.totalClients);
 
@@ -995,11 +1082,11 @@ function render() {
 
   // Scenarios
   document.getElementById('pessimistRevenue').textContent = fmtKc(rPess.totalRevenue);
-  document.getElementById('pessimistROI').textContent = fmt2(rPess.roi) + '×';
+  document.getElementById('pessimistROI').textContent = rPess.roi !== null ? fmt2(rPess.roi) + '×' : '—';
   document.getElementById('realistRevenue').textContent = fmtKc(r.totalRevenue);
-  document.getElementById('realistROI').textContent = fmt2(r.roi) + '×';
+  document.getElementById('realistROI').textContent = r.roi !== null ? fmt2(r.roi) + '×' : '—';
   document.getElementById('optimistRevenue').textContent = fmtKc(rOpt.totalRevenue);
-  document.getElementById('optimistROI').textContent = fmt2(rOpt.roi) + '×';
+  document.getElementById('optimistROI').textContent = rOpt.roi !== null ? fmt2(rOpt.roi) + '×' : '—';
 
   // Diagnosis
   const diag = diagnose(inputs, r);
@@ -1012,12 +1099,12 @@ function render() {
   let ctaSubline = 'Tvá vlastní data ti ukázala, kde stojíš. Teď je čas to proměnit v akci.';
   let ctaUrl = 'https://form.simpleshop.cz/DkVB/buy/';
   let ctaBtn = 'Vybrat a objednat další balíček';
-  if (r.roi < 1.0) {
+  if (r.roi !== null && r.roi < 1.0) {
     ctaHeadline = 'Nejdřív investuj do dovedností';
     ctaSubline = 'Tvá data ukazují, že balíček by ti aktuálně nepřinesl návratnost. Doporučujeme nejdřív investovat do tréninku obchodních dovedností.';
     ctaUrl = 'https://coachville.eu/acc-vycvik';
     ctaBtn = 'Vyzkoušet ACC výcvik';
-  } else if (r.roi >= 5) {
+  } else if (r.roi !== null && r.roi >= 5) {
     ctaHeadline = 'Další krok:';
     ctaSubline = 'Tvé konverze ukazují, že máš dovednosti. Návratnost investice > 5× = scale fáze. Větší balíček = víc kontaktů = víc hráčů.';
     ctaUrl = 'https://form.simpleshop.cz/DkVB/buy/';
@@ -1035,14 +1122,14 @@ function render() {
   const annualClients = r.totalClients * n;
   const annualPackageCost = inputs.packagePrice * n;
   const annualProfit = annualRevenue - annualPackageCost;
-  const annualROI = annualRevenue / Math.max(1, annualPackageCost);
+  const annualROI = annualPackageCost > 0 ? annualRevenue / annualPackageCost : null;
   const bonusRevenue = r.totalRevenue * (n - 1);
   const bonusClients = r.totalClients * (n - 1);
 
   document.getElementById('annualRevenueBig').textContent = fmtKc(annualRevenue);
   document.getElementById('annualClientsBig').textContent = fmtInt(annualClients);
   document.getElementById('annualProfitBig').textContent = fmtKc(annualProfit);
-  document.getElementById('annualROIBig').textContent = fmt2(annualROI) + '×';
+  document.getElementById('annualROIBig').textContent = annualROI !== null ? fmt2(annualROI) + '×' : '—';
   document.getElementById('bonusRevenueBig').textContent = (bonusRevenue >= 0 ? '+' : '') + fmtKc(bonusRevenue);
   document.getElementById('bonusClientsBig').textContent = fmtInt(bonusClients);
   document.getElementById('packagesPerYearDisplay').textContent = n;
@@ -1060,9 +1147,9 @@ function drawChart(rPess, rReal, rOpt, pkgPrice) {
     data: {
       labels,
       datasets: [
-        { label: '−30 %', data: cumul(build12MonthTimeline(rPess.firstSeasonRevenue, rPess.extensionRevenue, rPess.referralRevenue)), borderColor: '#EF4444', backgroundColor: 'rgba(239,68,68,.06)', tension: .3, fill: true, borderWidth: 2 },
+        { label: 'Horší den (0,7×)', data: cumul(build12MonthTimeline(rPess.firstSeasonRevenue, rPess.extensionRevenue, rPess.referralRevenue)), borderColor: '#EF4444', backgroundColor: 'rgba(239,68,68,.06)', tension: .3, fill: true, borderWidth: 2 },
         { label: 'Tvá data', data: cumul(build12MonthTimeline(rReal.firstSeasonRevenue, rReal.extensionRevenue, rReal.referralRevenue)), borderColor: '#38C0C3', backgroundColor: 'rgba(56,192,195,.14)', tension: .3, fill: true, borderWidth: 3 },
-        { label: '+30 %', data: cumul(build12MonthTimeline(rOpt.firstSeasonRevenue, rOpt.extensionRevenue, rOpt.referralRevenue)), borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,.06)', tension: .3, fill: true, borderWidth: 2 },
+        { label: 'Lepší den (1,3×)', data: cumul(build12MonthTimeline(rOpt.firstSeasonRevenue, rOpt.extensionRevenue, rOpt.referralRevenue)), borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,.06)', tension: .3, fill: true, borderWidth: 2 },
         { label: 'Cena balíčku (break-even)', data: labels.map(() => pkgPrice), borderColor: '#BF933A', borderDash: [6,4], borderWidth: 2, pointRadius: 0, fill: false }
       ]
     },
