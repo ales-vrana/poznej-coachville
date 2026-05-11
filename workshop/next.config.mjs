@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: '/workshop',
   images: {
     formats: ['image/avif', 'image/webp'],
   },
