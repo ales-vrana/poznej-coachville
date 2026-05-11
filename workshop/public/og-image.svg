@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Workshop koučování — Open Graph image">
+  <defs>
+    <linearGradient id="ogBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#283254"/>
+      <stop offset="100%" stop-color="#394A82"/>
+    </linearGradient>
+    <radialGradient id="ogHalo" cx="0.5" cy="1" r="0.7">
+      <stop offset="0%" stop-color="#BF933A" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#BF933A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#ogBg)"/>
+  <ellipse cx="600" cy="630" rx="700" ry="320" fill="url(#ogHalo)"/>
+
+  <!-- Mountains -->
+  <path d="M0,520 L160,420 L340,470 L520,380 L700,460 L880,360 L1060,440 L1200,400 L1200,630 L0,630 Z" fill="#1a2138" opacity="0.9"/>
+
+  <!-- Brand label top -->
+  <text x="80" y="100" font-family="Montserrat, Arial" font-size="18" letter-spacing="6" font-weight="700" fill="#BF933A">★ COACHVILLE EUROPE</text>
+
+  <!-- Main text -->
+  <text x="80" y="220" font-family="Montserrat, Arial" font-size="28" font-weight="500" fill="#FAF9F5" opacity="0.85">Otázka, na kterou si nejde odpovědět v hlavě:</text>
+  <text x="80" y="310" font-family="Montserrat, Arial" font-size="72" font-weight="800" fill="#FFFFFF">„Půjde mi to vůbec?"</text>
+  <text x="80" y="380" font-family="Montserrat, Arial" font-size="28" font-weight="500" fill="#38C0C3">Workshop koučování s ICF MCC | 19. 5. 2026</text>
+
+  <!-- CTA -->
+  <rect x="80" y="430" width="280" height="64" rx="10" fill="#38C0C3"/>
+  <text x="220" y="471" text-anchor="middle" font-family="Montserrat, Arial" font-size="20" font-weight="700" fill="#1a2138" letter-spacing="2">1 500 Kč — KOUPIT</text>
+</svg>

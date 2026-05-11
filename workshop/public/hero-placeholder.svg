@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="CoachVille brand hero — hora a postava na vrcholu">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2138"/>
+      <stop offset="35%" stop-color="#283254"/>
+      <stop offset="70%" stop-color="#394A82"/>
+      <stop offset="100%" stop-color="#5267a5"/>
+    </linearGradient>
+    <linearGradient id="sunGlow" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#BF933A" stop-opacity="0.55"/>
+      <stop offset="50%" stop-color="#BF933A" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#BF933A" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="mountainBack" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2c3963"/>
+      <stop offset="100%" stop-color="#1a2138"/>
+    </linearGradient>
+    <linearGradient id="mountainFront" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#324273"/>
+      <stop offset="100%" stop-color="#1a2138"/>
+    </linearGradient>
+    <radialGradient id="sunHalo" cx="0.5" cy="1" r="0.7">
+      <stop offset="0%" stop-color="#BF933A" stop-opacity="0.85"/>
+      <stop offset="40%" stop-color="#BF933A" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#BF933A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+
+  <!-- Sun halo -->
+  <ellipse cx="800" cy="720" rx="900" ry="400" fill="url(#sunHalo)"/>
+  <!-- Sun glow column -->
+  <rect x="0" y="0" width="1600" height="780" fill="url(#sunGlow)" opacity="0.6"/>
+
+  <!-- Stars/sparkles -->
+  <g fill="#FAF9F5" opacity="0.45">
+    <circle cx="180" cy="120" r="1.2"/>
+    <circle cx="320" cy="80" r="0.9"/>
+    <circle cx="500" cy="150" r="1"/>
+    <circle cx="1240" cy="110" r="1.1"/>
+    <circle cx="1420" cy="170" r="1"/>
+    <circle cx="1500" cy="60" r="0.8"/>
+    <circle cx="80" cy="220" r="0.9"/>
+    <circle cx="940" cy="60" r="1"/>
+  </g>
+
+  <!-- CoachVille gold star (subtle brand mark) -->
+  <g transform="translate(1280, 130)" opacity="0.7">
+    <polygon points="0,-14 4,-4 14,-2 6,5 8,15 0,10 -8,15 -6,5 -14,-2 -4,-4" fill="#BF933A"/>
+  </g>
+
+  <!-- Far mountains -->
+  <path d="M0,720 L200,580 L380,650 L560,520 L780,640 L960,500 L1140,620 L1320,540 L1500,640 L1600,600 L1600,1000 L0,1000 Z" fill="url(#mountainBack)" opacity="0.85"/>
+
+  <!-- Mid mountains -->
+  <path d="M0,820 L240,650 L420,750 L640,580 L820,720 L1040,560 L1240,720 L1440,640 L1600,740 L1600,1000 L0,1000 Z" fill="url(#mountainFront)" opacity="0.95"/>
+
+  <!-- Front mountain (where the person stands) -->
+  <path d="M0,1000 L0,880 L380,720 L780,560 L1180,720 L1600,860 L1600,1000 Z" fill="#1a2138"/>
+
+  <!-- Clouds below peaks (low-lying mist) -->
+  <g fill="#FAF9F5" opacity="0.12">
+    <ellipse cx="300" cy="800" rx="220" ry="22"/>
+    <ellipse cx="1100" cy="830" rx="280" ry="26"/>
+    <ellipse cx="1500" cy="810" rx="180" ry="18"/>
+  </g>
+
+  <!-- Person silhouette on peak (arms wide) -->
+  <g transform="translate(780, 480)">
+    <!-- Body -->
+    <path d="M0,40 L0,90 M0,90 L-12,140 M0,90 L12,140" stroke="#FAF9F5" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <!-- Arms (wide) -->
+    <path d="M0,55 L-55,30 M0,55 L55,30" stroke="#FAF9F5" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <!-- Head -->
+    <circle cx="0" cy="30" r="9" fill="#FAF9F5"/>
+    <!-- Subtle glow around figure -->
+    <circle cx="0" cy="80" r="80" fill="#BF933A" opacity="0.08"/>
+  </g>
+
+  <!-- Teal accent line (brand) -->
+  <line x1="0" y1="998" x2="1600" y2="998" stroke="#38C0C3" stroke-width="2" opacity="0.4"/>
+</svg>

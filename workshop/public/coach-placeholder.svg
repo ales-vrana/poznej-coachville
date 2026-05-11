@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Placeholder pro fotku Aleše Vrány">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#394A82"/>
+      <stop offset="100%" stop-color="#283254"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg)"/>
+  <!-- Soft circle glow -->
+  <circle cx="200" cy="180" r="180" fill="#38C0C3" opacity="0.08"/>
+  <!-- Person silhouette -->
+  <circle cx="200" cy="155" r="55" fill="#FAF9F5" opacity="0.92"/>
+  <path d="M85,400 C85,290 130,240 200,240 C270,240 315,290 315,400 Z" fill="#FAF9F5" opacity="0.92"/>
+  <!-- Brand star -->
+  <g transform="translate(340, 60)" opacity="0.75">
+    <polygon points="0,-12 3,-4 12,-3 5,3 7,12 0,8 -7,12 -5,3 -12,-3 -3,-4" fill="#BF933A"/>
+  </g>
+  <!-- Initials -->
+  <text x="200" y="160" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="42" font-weight="800" fill="#394A82">AV</text>
+</svg>
