@@ -3,7 +3,9 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/video", "destination": "/video/index.html" },
-    { "source": "/call",  "destination": "/call/index.html" }
+    { "source": "/call",  "destination": "/call/index.html" },
+    { "source": "/workshop", "destination": "https://workshop-theta-ten.vercel.app/workshop" },
+    { "source": "/workshop/:path*", "destination": "https://workshop-theta-ten.vercel.app/workshop/:path*" }
   ],
   "redirects": [
     { "source": "/videa", "destination": "/video", "permanent": false },
