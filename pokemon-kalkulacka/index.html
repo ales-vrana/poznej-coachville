@@ -330,6 +330,57 @@
     100% { color: var(--navy); transform: scale(1); }
   }
 
+  /* 3-state widget content visibility */
+  .fr-state { display: none; }
+  .floating-result.state-started .fr-state-started { display: block; }
+  .floating-result.state-calculating .fr-state-calculating { display: block; }
+
+  /* Encourage box (started state) */
+  .fr-encourage {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FFFBEB 100%);
+    border: 1px solid var(--gold-light);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.4;
+    margin: 8px 0 0 0;
+  }
+
+  /* Checklist (started state) */
+  .fr-checklist {
+    margin: 12px 0 0 0; padding: 0; list-style: none;
+    font-size: 11px;
+  }
+  .fr-checklist li {
+    padding: 6px 0 6px 22px; position: relative;
+    color: var(--muted);
+    border-bottom: 1px dashed #F3F4F6;
+  }
+  .fr-checklist li:last-child { border-bottom: none; }
+  .fr-checklist li::before {
+    content: '⏳'; position: absolute; left: 0; top: 6px;
+    font-size: 12px;
+  }
+  .fr-checklist li.done {
+    color: var(--teal-dark);
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+  .fr-checklist li.done::before { content: '✓'; color: var(--teal); }
+
+  /* Refine note (calculating state) */
+  .fr-refine {
+    background: var(--paper);
+    border: 1px dashed var(--gold-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: var(--ink);
+    margin-top: 12px;
+    line-height: 1.35;
+  }
+
   @media (max-width: 768px) {
     .floating-result {
       width: auto; left: 12px; right: 12px;
@@ -342,6 +393,9 @@
     .fr-stat { font-size: 11px; padding: 3px 0; }
     .fr-stat strong { font-size: 13px; }
     .recalc-badge { margin-top: 4px; font-size: 8px; padding: 3px 8px; }
+    .fr-encourage { font-size: 11px; padding: 10px; }
+    .fr-checklist { font-size: 10px; }
+    .fr-refine { font-size: 10px; padding: 8px 10px; }
   }
 </style>
 </head>
@@ -840,6 +894,37 @@
   </div>
 </footer>
 
+<!-- FLOATING TVŮJ VÝSLEDEK WIDGET — 3 stavy (empty/started/calculating) -->
+<!-- Pozor: musí být před skriptem aby DOM elementy existovaly při běhu -->
+<div id="floatingResult" class="floating-result">
+  <button class="fr-close" id="frCloseBtn" aria-label="Zavřít widget">×</button>
+  <div class="fr-label">⭐ Tvůj výsledek</div>
+
+  <!-- STATE: STARTED — user začal zadávat, ale chybí klient + fakturace -->
+  <div class="fr-state fr-state-started">
+    <div class="fr-encourage">💡 <strong>Zadej další údaje</strong> pro první výpočet obratů a návratnosti.</div>
+    <ul class="fr-checklist" id="frChecklist">
+      <li data-key="package">Cena balíčku</li>
+      <li data-key="contacts">Počet kontaktů</li>
+      <li data-key="funnel">Cold call funnel</li>
+      <li data-key="clients">Počet platících hráčů</li>
+      <li data-key="revenue">Vyfakturovaná částka</li>
+    </ul>
+  </div>
+
+  <!-- STATE: CALCULATING — výpočet k dispozici -->
+  <div class="fr-state fr-state-calculating">
+    <div class="fr-hero" id="floatingRevenue">0 Kč</div>
+    <div class="fr-stat"><span>Návratnost</span><strong id="floatingROI">—</strong></div>
+    <div class="fr-stat"><span>Hráčů</span><strong id="floatingClients">0</strong></div>
+    <div class="fr-stat"><span>Profit</span><strong id="floatingProfit">0 Kč</strong></div>
+    <div class="fr-refine">💡 <strong>Zadej další data</strong> pro upřesnění výsledku.</div>
+    <div class="text-center">
+      <span class="recalc-badge" id="recalcBadge">✨ Přepočteno</span>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // POKÉMON ROI CALCULATOR — Count-based, on-brand, integers
@@ -1335,6 +1420,10 @@ INPUT_IDS.forEach(id => {
     }
     syncDependents();
     render();
+    // Trigger widget state update na každém input change
+    if (typeof updateFloatingVisibility === 'function') {
+      updateFloatingVisibility();
+    }
   });
 });
 
@@ -1386,19 +1475,55 @@ document.getElementById('shareBtn').addEventListener('click', () => {
   }
 })();
 
-// === FLOATING WIDGET — data-driven show/hide logic ===
-// Widget se objeví až user zadá: alespoň 1 hráče A alespoň nějakou vyfakturovanou částku.
-// MUSÍ být před initial render() call kvůli TDZ (let _frDismissed).
+// === FLOATING WIDGET — 3 STATES (empty / started / calculating) ===
+// EMPTY: vše = 0 → widget hidden
+// STARTED: nějaký input > 0, ale chybí počet hráčů NEBO fakturace → encourage box
+// CALCULATING: hráč > 0 AND fakturace > 0 → čísla + refine box
 var _frDismissed = false;
 var floatingEl = document.getElementById('floatingResult');
 var mainResultCard = document.querySelector('section.max-w-4xl > .card.mb-6.text-center');
 
-function hasMinimalData() {
-  var anoHned = parseFloat(document.getElementById('anoHnedCount').value) || 0;
-  var anoPozdeji = parseFloat(document.getElementById('anoPozdejiConvertedCount').value) || 0;
-  var anoHnedRev = parseFloat(document.getElementById('anoHnedRevenue').value) || 0;
-  var anoPozdejiRev = parseFloat(document.getElementById('anoPozdejiRevenue').value) || 0;
-  return (anoHned > 0 || anoPozdeji > 0) && (anoHnedRev > 0 || anoPozdejiRev > 0);
+function getWidgetState() {
+  function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+  var packagePrice = v('packagePrice');
+  var contactsNew = v('contactsNew');
+  var contactsBonus = v('contactsBonus');
+  var pickup = v('pickupCount');
+  var interest = v('interestCount');
+  var booked = v('bookedCount');
+  var attended = v('attendedCount');
+  var anoHned = v('anoHnedCount');
+  var anoPozdeji = v('anoPozdejiConvertedCount');
+  var anoHnedRev = v('anoHnedRevenue');
+  var anoPozdejiRev = v('anoPozdejiRevenue');
+
+  var anyInputNonZero = packagePrice > 0 || contactsNew > 0 || contactsBonus > 0 ||
+    pickup > 0 || interest > 0 || booked > 0 || attended > 0 ||
+    anoHned > 0 || anoPozdeji > 0 || anoHnedRev > 0 || anoPozdejiRev > 0;
+
+  if (!anyInputNonZero) return 'empty';
+
+  var hasClients = anoHned > 0 || anoPozdeji > 0;
+  var hasRevenue = anoHnedRev > 0 || anoPozdejiRev > 0;
+  if (hasClients && hasRevenue) return 'calculating';
+  return 'started';
+}
+
+function updateChecklist() {
+  function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+  var checks = {
+    'package': v('packagePrice') > 0,
+    'contacts': (v('contactsNew') + v('contactsBonus')) > 0,
+    'funnel': v('attendedCount') > 0,
+    'clients': (v('anoHnedCount') + v('anoPozdejiConvertedCount')) > 0,
+    'revenue': (v('anoHnedRevenue') + v('anoPozdejiRevenue')) > 0
+  };
+  var items = document.querySelectorAll('#frChecklist li');
+  for (var i = 0; i < items.length; i++) {
+    var key = items[i].getAttribute('data-key');
+    if (checks[key]) items[i].classList.add('done');
+    else items[i].classList.remove('done');
+  }
 }
 
 function updateFloatingVisibility() {
@@ -1407,10 +1532,22 @@ function updateFloatingVisibility() {
     floatingEl.classList.remove('visible');
     return;
   }
-  if (!hasMinimalData()) {
-    floatingEl.classList.remove('visible');
+
+  var state = getWidgetState();
+
+  // EMPTY → skrýt widget
+  if (state === 'empty') {
+    floatingEl.classList.remove('visible', 'state-started', 'state-calculating');
     return;
   }
+
+  // Set state class (zachovat current state visibility)
+  floatingEl.classList.remove('state-empty', 'state-started', 'state-calculating');
+  floatingEl.classList.add('state-' + state);
+
+  // Update checklist for STARTED state
+  if (state === 'started') updateChecklist();
+
   // Hide když main result card je on-screen (avoid duplikace)
   if (mainResultCard) {
     var rect = mainResultCard.getBoundingClientRect();
@@ -1441,18 +1578,6 @@ window._frInitialized = true;
 render();
 updateFloatingVisibility();
 </script>
-<!-- FLOATING TVŮJ VÝSLEDEK WIDGET (sticky, viditelný při editaci vstupů) -->
-<div id="floatingResult" class="floating-result">
-  <button class="fr-close" id="frCloseBtn" aria-label="Zavřít widget">×</button>
-  <div class="fr-label">⭐ Tvůj výsledek</div>
-  <div class="fr-hero" id="floatingRevenue">0 Kč</div>
-  <div class="fr-stat"><span>Návratnost</span><strong id="floatingROI">—</strong></div>
-  <div class="fr-stat"><span>Hráčů</span><strong id="floatingClients">0</strong></div>
-  <div class="fr-stat"><span>Profit</span><strong id="floatingProfit">0 Kč</strong></div>
-  <div class="text-center">
-    <span class="recalc-badge" id="recalcBadge">✨ Přepočteno</span>
-  </div>
-</div>
 
 </body>
 </html>
