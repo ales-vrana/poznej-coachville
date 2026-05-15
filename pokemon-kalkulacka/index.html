@@ -69,13 +69,19 @@
     border: 2px solid var(--navy); cursor: pointer; transition: all .2s;
   }
   .btn-secondary:hover { background: var(--navy); color: white; }
+  /* Nákupní tlačítko ceny balíčků - tmavě zelené */
   .btn-link {
-    color: var(--teal-dark); text-decoration: none; font-weight: 600;
-    font-size: 13px; padding: 10px 16px; background: white;
-    border: 1.5px dashed var(--teal); border-radius: 999px;
-    transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.04em;
+    color: white; text-decoration: none; font-weight: 700;
+    font-size: 13px; padding: 12px 22px; background: #15803D;
+    border: none; border-radius: 999px;
+    transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
   }
-  .btn-link:hover { background: var(--teal-light); border-style: solid; }
+  .btn-link:hover {
+    background: #166534; transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(21, 128, 61, 0.35);
+    color: white;
+  }
 
   /* Cards */
   .card {
@@ -461,7 +467,6 @@
 <!-- LEGEND -->
 <section class="max-w-4xl mx-auto px-6 mb-4">
   <div class="legend-row">
-    <span><span class="badge" style="background:#FDF6E3; color: var(--gold); border: 1px solid var(--gold-light);">Žluté pole</span> = vstup s defaultem</span>
     <span><span class="badge" style="background:white; color: var(--teal-dark); border: 1px solid var(--teal);">Bílé pole</span> = tvá vlastní data</span>
     <span><span class="badge" style="background:white; color: var(--teal-dark); border: 1.5px dashed var(--teal-light);">Přerušovaný rámeček</span> = vypočtená hodnota</span>
   </div>
@@ -792,7 +797,7 @@
     <p class="text-xs text-gray-500 mb-4">Tvé reálné výsledky mohou být drobně horší nebo lepší než zadané. Toto ukazuje rozsah při škálování tvých vstupů 0,7× (horší den) a 1,3× (lepší den).</p>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
       <div class="scenario-card pessimist">
-        <div class="cell-label mb-1" style="color:#EF4444">Horší den (0,7×)</div>
+        <div class="cell-label mb-1" style="color:#EF4444">Horší výsledek (0,7×)</div>
         <div class="stat-num" id="pessimistRevenue">0 Kč</div>
         <div class="text-xs text-gray-500 mt-2"><span id="pessimistROI">0×</span> návratnost</div>
       </div>
@@ -802,7 +807,7 @@
         <div class="text-xs text-gray-500 mt-2"><span id="realistROI">0×</span> návratnost</div>
       </div>
       <div class="scenario-card optimist">
-        <div class="cell-label mb-1" style="color:#10B981">Lepší den (1,3×)</div>
+        <div class="cell-label mb-1" style="color:#10B981">Lepší výsledek (1,3×)</div>
         <div class="stat-num" style="color:#10B981" id="optimistRevenue">0 Kč</div>
         <div class="text-xs text-gray-500 mt-2"><span id="optimistROI">0×</span> návratnost</div>
       </div>
@@ -1373,9 +1378,9 @@ function drawChart(rPess, rReal, rOpt, pkgPrice) {
     data: {
       labels,
       datasets: [
-        { label: 'Horší den (0,7×)', data: cumul(build12MonthTimeline(rPess.firstSeasonRevenue, rPess.extensionRevenue, rPess.referralRevenue)), borderColor: '#EF4444', backgroundColor: 'rgba(239,68,68,.06)', tension: .3, fill: true, borderWidth: 2 },
+        { label: 'Horší výsledek (0,7×)', data: cumul(build12MonthTimeline(rPess.firstSeasonRevenue, rPess.extensionRevenue, rPess.referralRevenue)), borderColor: '#EF4444', backgroundColor: 'rgba(239,68,68,.06)', tension: .3, fill: true, borderWidth: 2 },
         { label: 'Tvá data', data: cumul(build12MonthTimeline(rReal.firstSeasonRevenue, rReal.extensionRevenue, rReal.referralRevenue)), borderColor: '#38C0C3', backgroundColor: 'rgba(56,192,195,.14)', tension: .3, fill: true, borderWidth: 3 },
-        { label: 'Lepší den (1,3×)', data: cumul(build12MonthTimeline(rOpt.firstSeasonRevenue, rOpt.extensionRevenue, rOpt.referralRevenue)), borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,.06)', tension: .3, fill: true, borderWidth: 2 },
+        { label: 'Lepší výsledek (1,3×)', data: cumul(build12MonthTimeline(rOpt.firstSeasonRevenue, rOpt.extensionRevenue, rOpt.referralRevenue)), borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,.06)', tension: .3, fill: true, borderWidth: 2 },
         { label: 'Cena balíčku (break-even)', data: labels.map(() => pkgPrice), borderColor: '#BF933A', borderDash: [6,4], borderWidth: 2, pointRadius: 0, fill: false }
       ]
     },
