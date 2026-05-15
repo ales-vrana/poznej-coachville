@@ -346,6 +346,11 @@
     line-height: 1.4;
     margin: 8px 0 0 0;
   }
+  .fr-hint {
+    display: inline-block; margin-top: 4px;
+    font-size: 12px; color: var(--muted);
+    font-style: italic; font-weight: 500;
+  }
 
   /* Checklist (started state) */
   .fr-checklist {
@@ -900,13 +905,13 @@
   <button class="fr-close" id="frCloseBtn" aria-label="Zavřít widget">×</button>
   <div class="fr-label">⭐ Tvůj výsledek</div>
 
-  <!-- STATE: STARTED — user začal zadávat, ale chybí klient + fakturace -->
+  <!-- STATE: STARTED — viditelný od page load, prompt na zadávání + checklist -->
   <div class="fr-state fr-state-started">
-    <div class="fr-encourage">💡 <strong>Zadej další údaje</strong> pro první výpočet obratů a návratnosti.</div>
+    <div class="fr-encourage">💡 <strong>Zadej cenu balíčku a počet kontaktů</strong>, ať můžeš začít.<br><span class="fr-hint">Pokud nemáš konkrétní data, napiš svůj odhad.</span></div>
     <ul class="fr-checklist" id="frChecklist">
       <li data-key="package">Cena balíčku</li>
       <li data-key="contacts">Počet kontaktů</li>
-      <li data-key="funnel">Cold call funnel</li>
+      <li data-key="funnel">Navolávání kontaktů</li>
       <li data-key="clients">Počet platících hráčů</li>
       <li data-key="revenue">Vyfakturovaná částka</li>
     </ul>
@@ -1484,29 +1489,16 @@ var floatingEl = document.getElementById('floatingResult');
 var mainResultCard = document.querySelector('section.max-w-4xl > .card.mb-6.text-center');
 
 function getWidgetState() {
+  // 2 stavy: started (onboarding+checklist) NEBO calculating (numbers).
+  // Widget je viditelný od page load - žádný empty state.
   function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
-  var packagePrice = v('packagePrice');
-  var contactsNew = v('contactsNew');
-  var contactsBonus = v('contactsBonus');
-  var pickup = v('pickupCount');
-  var interest = v('interestCount');
-  var booked = v('bookedCount');
-  var attended = v('attendedCount');
   var anoHned = v('anoHnedCount');
   var anoPozdeji = v('anoPozdejiConvertedCount');
   var anoHnedRev = v('anoHnedRevenue');
   var anoPozdejiRev = v('anoPozdejiRevenue');
-
-  var anyInputNonZero = packagePrice > 0 || contactsNew > 0 || contactsBonus > 0 ||
-    pickup > 0 || interest > 0 || booked > 0 || attended > 0 ||
-    anoHned > 0 || anoPozdeji > 0 || anoHnedRev > 0 || anoPozdejiRev > 0;
-
-  if (!anyInputNonZero) return 'empty';
-
   var hasClients = anoHned > 0 || anoPozdeji > 0;
   var hasRevenue = anoHnedRev > 0 || anoPozdejiRev > 0;
-  if (hasClients && hasRevenue) return 'calculating';
-  return 'started';
+  return (hasClients && hasRevenue) ? 'calculating' : 'started';
 }
 
 function updateChecklist() {
@@ -1533,16 +1525,9 @@ function updateFloatingVisibility() {
     return;
   }
 
+  // Widget je viditelný od page load (žádný empty state)
   var state = getWidgetState();
-
-  // EMPTY → skrýt widget
-  if (state === 'empty') {
-    floatingEl.classList.remove('visible', 'state-started', 'state-calculating');
-    return;
-  }
-
-  // Set state class (zachovat current state visibility)
-  floatingEl.classList.remove('state-empty', 'state-started', 'state-calculating');
+  floatingEl.classList.remove('state-started', 'state-calculating');
   floatingEl.classList.add('state-' + state);
 
   // Update checklist for STARTED state
