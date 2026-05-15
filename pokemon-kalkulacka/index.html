@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalkulačka návratnosti Pokémon | CoachVille Europe</title>
-<meta name="description" content="Spočítej si reálnou návratnost balíčku Pokémon na svých vlastních datech. Zadej svá čísla. Pokud je nemáš, zadej odhad.">
+<meta name="description" content="Spočítej si reálnou návratnost balíčku Pokémon na svých vlastních datech. Návratnost investice do vlastní praxe.">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -365,7 +365,7 @@
     Pokémon Strategy<br>kalkulačka
   </h1>
   <p class="text-lg text-gray-700 max-w-2xl mx-auto mb-3 leading-relaxed">
-    Spočítej si návratnost balíčku Pokémon — <strong>na svých vlastních číslech</strong>. Zadej svá čísla. Pokud je nemáš, zadej odhad..
+    Spočítej si návratnost balíčku Pokémon — <strong>na svých vlastních číslech</strong>. Návratnost investice do vlastní praxe.
   </p>
   <p class="text-sm text-gray-500">
     Tvoje data, tvoje hra, tvoje rostoucí praxe.
@@ -1228,6 +1228,11 @@ function render() {
     badge.classList.add('flash');
     hero.classList.add('pulse');
   }
+
+  // Refresh visibility (data-driven trigger - objeví se po splnění podmínek)
+  if (typeof updateFloatingVisibility === 'function') {
+    updateFloatingVisibility();
+  }
 }
 
 function drawChart(rPess, rReal, rOpt, pkgPrice) {
@@ -1381,32 +1386,37 @@ document.getElementById('shareBtn').addEventListener('click', () => {
   }
 })();
 
-syncDependents();
-render();
+// === FLOATING WIDGET — data-driven show/hide logic ===
+// Widget se objeví až user zadá: alespoň 1 hráče A alespoň nějakou vyfakturovanou částku.
+// MUSÍ být před initial render() call kvůli TDZ (let _frDismissed).
+var _frDismissed = false;
+var floatingEl = document.getElementById('floatingResult');
+var mainResultCard = document.querySelector('section.max-w-4xl > .card.mb-6.text-center');
 
-// === FLOATING WIDGET — show/hide logic ===
-// Show widget after user scrolls past header (no need for initial visibility),
-// hide when main BIG RESULT card is on screen (avoid duplication)
-let _frDismissed = false;
-const floatingEl = document.getElementById('floatingResult');
-const mainResultCard = document.querySelector('section.max-w-4xl > .card.mb-6.text-center');
+function hasMinimalData() {
+  var anoHned = parseFloat(document.getElementById('anoHnedCount').value) || 0;
+  var anoPozdeji = parseFloat(document.getElementById('anoPozdejiConvertedCount').value) || 0;
+  var anoHnedRev = parseFloat(document.getElementById('anoHnedRevenue').value) || 0;
+  var anoPozdejiRev = parseFloat(document.getElementById('anoPozdejiRevenue').value) || 0;
+  return (anoHned > 0 || anoPozdeji > 0) && (anoHnedRev > 0 || anoPozdejiRev > 0);
+}
 
 function updateFloatingVisibility() {
+  if (!floatingEl) return;
   if (_frDismissed) {
     floatingEl.classList.remove('visible');
     return;
   }
-  const scrolledPast = window.scrollY > 250;
-  if (!scrolledPast) {
+  if (!hasMinimalData()) {
     floatingEl.classList.remove('visible');
     return;
   }
-  // Check if main result card is in viewport
+  // Hide když main result card je on-screen (avoid duplikace)
   if (mainResultCard) {
-    const rect = mainResultCard.getBoundingClientRect();
-    const viewportH = window.innerHeight;
-    const visible = rect.top < viewportH * 0.7 && rect.bottom > viewportH * 0.3;
-    if (visible) {
+    var rect = mainResultCard.getBoundingClientRect();
+    var viewportH = window.innerHeight;
+    var cardVisible = rect.top < viewportH * 0.7 && rect.bottom > viewportH * 0.3;
+    if (cardVisible) {
       floatingEl.classList.add('hidden-by-result');
       floatingEl.classList.remove('visible');
     } else {
@@ -1420,14 +1430,15 @@ function updateFloatingVisibility() {
 
 window.addEventListener('scroll', updateFloatingVisibility, { passive: true });
 window.addEventListener('resize', updateFloatingVisibility, { passive: true });
-
-document.getElementById('frCloseBtn').addEventListener('click', () => {
+document.getElementById('frCloseBtn').addEventListener('click', function() {
   _frDismissed = true;
   floatingEl.classList.remove('visible');
 });
 
-// Init initial render flag (skip flash animation on first render)
+// Initial render (PO setup floating widgetu - aby updateFloatingVisibility uvnitř render() fungoval bez TDZ)
+syncDependents();
 window._frInitialized = true;
+render();
 updateFloatingVisibility();
 </script>
 <!-- FLOATING TVŮJ VÝSLEDEK WIDGET (sticky, viditelný při editaci vstupů) -->
