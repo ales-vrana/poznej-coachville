@@ -330,10 +330,37 @@
     100% { color: var(--navy); transform: scale(1); }
   }
 
-  /* 3-state widget content visibility */
-  .fr-state { display: none; }
-  .floating-result.state-started .fr-state-started { display: block; }
-  .floating-result.state-calculating .fr-state-calculating { display: block; }
+  /* State-based content visibility */
+  .fr-only-started, .fr-only-calculating { display: none; }
+  .floating-result.state-started .fr-only-started { display: block; }
+  .floating-result.state-calculating .fr-only-calculating { display: block; }
+
+  /* CALCULATING state: hide completed items (focus na nedokončené) */
+  .floating-result.state-calculating .fr-checklist li.done { display: none; }
+
+  /* ALL DONE badge (jen v calculating když vše hotové) */
+  .fr-all-done {
+    display: none;
+    background: linear-gradient(135deg, #D1FAE5 0%, #ECFDF5 100%);
+    border: 1px solid #6EE7B7;
+    color: #065F46;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.35;
+    margin-top: 10px;
+    text-align: center;
+  }
+  .floating-result.state-all-done .fr-all-done { display: block; }
+  .floating-result.state-all-done .fr-checklist,
+  .floating-result.state-all-done .fr-refine { display: none; }
+
+  /* Extension progress counter (x/4) */
+  .fr-ext-progress {
+    font-size: 10px; font-weight: 600; color: var(--gold);
+    margin-left: 4px;
+  }
+  li.done .fr-ext-progress { color: var(--teal-dark); }
 
   /* Encourage box (started state) */
   .fr-encourage {
@@ -905,28 +932,39 @@
   <button class="fr-close" id="frCloseBtn" aria-label="Zavřít widget">×</button>
   <div class="fr-label">⭐ Tvůj výsledek</div>
 
-  <!-- STATE: STARTED — viditelný od page load, prompt na zadávání + checklist -->
-  <div class="fr-state fr-state-started">
+  <!-- STARTED state encouragement (viditelné jen pokud chybí klient+revenue) -->
+  <div class="fr-only-started">
     <div class="fr-encourage">💡 <strong>Zadej cenu balíčku a počet kontaktů</strong>, ať můžeš začít.<br><span class="fr-hint">Pokud nemáš konkrétní data, napiš svůj odhad.</span></div>
-    <ul class="fr-checklist" id="frChecklist">
-      <li data-key="package">Cena balíčku</li>
-      <li data-key="contacts">Počet kontaktů</li>
-      <li data-key="funnel">Navolávání kontaktů</li>
-      <li data-key="clients">Počet platících hráčů</li>
-      <li data-key="revenue">Vyfakturovaná částka</li>
-    </ul>
   </div>
 
-  <!-- STATE: CALCULATING — výpočet k dispozici -->
-  <div class="fr-state fr-state-calculating">
+  <!-- CALCULATING state numbers (viditelné jen pokud máš klient+revenue) -->
+  <div class="fr-only-calculating">
     <div class="fr-hero" id="floatingRevenue">0 Kč</div>
     <div class="fr-stat"><span>Návratnost</span><strong id="floatingROI">—</strong></div>
     <div class="fr-stat"><span>Hráčů</span><strong id="floatingClients">0</strong></div>
     <div class="fr-stat"><span>Profit</span><strong id="floatingProfit">0 Kč</strong></div>
-    <div class="fr-refine">💡 <strong>Zadej další data</strong> pro upřesnění výsledku.</div>
-    <div class="text-center">
-      <span class="recalc-badge" id="recalcBadge">✨ Přepočteno</span>
-    </div>
+    <div class="fr-refine" id="frRefine">💡 <strong>Zadej další data</strong> pro upřesnění výsledku:</div>
+  </div>
+
+  <!-- SHARED CHECKLIST 9 položek — viditelný v obou stavech, v calculating skrývá .done -->
+  <ul class="fr-checklist" id="frChecklist">
+    <li data-key="package">Cena balíčku</li>
+    <li data-key="contacts">Počet kontaktů</li>
+    <li data-key="funnel">Navolávání kontaktů</li>
+    <li data-key="clients">Počet platících hráčů</li>
+    <li data-key="revenue">Vyfakturovaná částka</li>
+    <li data-key="seasonPrice">Cena další sezóny</li>
+    <li data-key="extensions">Prodloužení sezón <span class="fr-ext-progress" id="frExtProgress">(0/4)</span></li>
+    <li data-key="referralCount">Počet doporučení</li>
+    <li data-key="referralCloseRate">Konverze doporučení</li>
+  </ul>
+
+  <!-- Když všech 9 položek done v calculating: pochvalná zpráva -->
+  <div class="fr-all-done" id="frAllDone">✓ <strong>Vše vyplněno</strong> — výsledek je nejpřesnější možný.</div>
+
+  <!-- Recalc badge - jen v calculating state -->
+  <div class="fr-only-calculating text-center">
+    <span class="recalc-badge" id="recalcBadge">✨ Přepočteno</span>
   </div>
 </div>
 
@@ -1503,19 +1541,35 @@ function getWidgetState() {
 
 function updateChecklist() {
   function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+  var extCount = (v('ext1') > 0 ? 1 : 0) + (v('ext2') > 0 ? 1 : 0) + (v('ext3') > 0 ? 1 : 0) + (v('ext4') > 0 ? 1 : 0);
   var checks = {
     'package': v('packagePrice') > 0,
     'contacts': (v('contactsNew') + v('contactsBonus')) > 0,
     'funnel': v('attendedCount') > 0,
     'clients': (v('anoHnedCount') + v('anoPozdejiConvertedCount')) > 0,
-    'revenue': (v('anoHnedRevenue') + v('anoPozdejiRevenue')) > 0
+    'revenue': (v('anoHnedRevenue') + v('anoPozdejiRevenue')) > 0,
+    'seasonPrice': v('seasonPrice') > 0,
+    'extensions': extCount === 4,
+    'referralCount': v('referralCount') > 0,
+    'referralCloseRate': v('referralCloseRate') > 0
   };
+  // Update extension progress counter (x/4)
+  var progressEl = document.getElementById('frExtProgress');
+  if (progressEl) progressEl.textContent = '(' + extCount + '/4)';
+
+  // Update each checklist item
   var items = document.querySelectorAll('#frChecklist li');
+  var allDone = true;
   for (var i = 0; i < items.length; i++) {
     var key = items[i].getAttribute('data-key');
-    if (checks[key]) items[i].classList.add('done');
-    else items[i].classList.remove('done');
+    if (checks[key]) {
+      items[i].classList.add('done');
+    } else {
+      items[i].classList.remove('done');
+      allDone = false;
+    }
   }
+  return allDone;
 }
 
 function updateFloatingVisibility() {
@@ -1527,11 +1581,13 @@ function updateFloatingVisibility() {
 
   // Widget je viditelný od page load (žádný empty state)
   var state = getWidgetState();
-  floatingEl.classList.remove('state-started', 'state-calculating');
+  var allDone = updateChecklist(); // checklist update + return allDone flag
+  floatingEl.classList.remove('state-started', 'state-calculating', 'state-all-done');
   floatingEl.classList.add('state-' + state);
-
-  // Update checklist for STARTED state
-  if (state === 'started') updateChecklist();
+  // V calculating state + vše vyplněno → přidat all-done class (skryje checklist + refine, ukáže pochvalu)
+  if (state === 'calculating' && allDone) {
+    floatingEl.classList.add('state-all-done');
+  }
 
   // Hide když main result card je on-screen (avoid duplikace)
   if (mainResultCard) {
