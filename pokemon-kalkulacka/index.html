@@ -268,6 +268,81 @@
     box-shadow: 0 4px 20px rgba(191, 147, 58, 0.35);
   }
   .count-up { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  /* === FLOATING TVŮJ VÝSLEDEK WIDGET === */
+  .floating-result {
+    position: fixed; right: 24px; top: 50%; transform: translateY(-50%);
+    width: 260px; background: white;
+    border: 2px solid var(--teal); border-radius: 18px;
+    padding: 20px 22px; box-shadow: 0 12px 40px rgba(57, 74, 130, 0.18);
+    z-index: 80; font-family: 'Montserrat';
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0; pointer-events: none;
+  }
+  .floating-result.visible { opacity: 1; pointer-events: auto; }
+  .floating-result.hidden-by-result { opacity: 0; pointer-events: none; transform: translateY(-50%) translateX(20px); }
+  .fr-close {
+    position: absolute; top: 8px; right: 10px;
+    background: transparent; border: none; cursor: pointer;
+    font-size: 18px; color: var(--muted); line-height: 1;
+    padding: 4px 6px; border-radius: 4px;
+  }
+  .fr-close:hover { background: #F3F4F6; color: var(--navy); }
+  .fr-label {
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--gold);
+    font-weight: 800; margin-bottom: 6px;
+  }
+  .fr-hero {
+    font-size: 26px; font-weight: 900; color: var(--navy);
+    line-height: 1.1; margin-bottom: 10px;
+    transition: color 0.6s, transform 0.3s;
+  }
+  .fr-stat {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 13px; color: var(--ink);
+    padding: 6px 0; border-bottom: 1px solid #F3F4F6;
+  }
+  .fr-stat:last-of-type { border-bottom: none; }
+  .fr-stat strong { font-weight: 800; color: var(--navy); font-size: 15px; }
+  .recalc-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: var(--navy);
+    font-size: 9px; font-weight: 800;
+    padding: 4px 10px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    opacity: 0;
+    margin-top: 10px;
+  }
+  .recalc-badge.flash { animation: recalcFlash 1.5s ease-out; }
+  @keyframes recalcFlash {
+    0% { opacity: 0; transform: scale(0.7); }
+    15% { opacity: 1; transform: scale(1.15); }
+    30% { transform: scale(1); }
+    75% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1); }
+  }
+  .fr-hero.pulse { animation: heroPulse 0.7s ease-out; }
+  @keyframes heroPulse {
+    0% { color: var(--gold); transform: scale(1); }
+    20% { transform: scale(1.04); }
+    100% { color: var(--navy); transform: scale(1); }
+  }
+
+  @media (max-width: 768px) {
+    .floating-result {
+      width: auto; left: 12px; right: 12px;
+      top: auto; bottom: 12px; transform: none;
+      padding: 12px 16px; border-radius: 14px;
+    }
+    .floating-result.hidden-by-result { transform: translateY(120%); }
+    .fr-label { font-size: 9px; margin-bottom: 2px; }
+    .fr-hero { font-size: 20px; margin-bottom: 6px; }
+    .fr-stat { font-size: 11px; padding: 3px 0; }
+    .fr-stat strong { font-size: 13px; }
+    .recalc-badge { margin-top: 4px; font-size: 8px; padding: 3px 8px; }
+  }
 </style>
 </head>
 <body class="min-h-screen">
@@ -1135,6 +1210,24 @@ function render() {
   document.getElementById('packagesPerYearDisplay').textContent = n;
 
   drawChart(rPess, r, rOpt, inputs.packagePrice);
+
+  // FLOATING WIDGET update (sticky výsledek viditelný při editaci)
+  document.getElementById('floatingRevenue').textContent = fmtKc(r.totalRevenue);
+  document.getElementById('floatingROI').textContent = r.roi !== null ? fmt2(r.roi) + '×' : '—';
+  document.getElementById('floatingClients').textContent = fmtInt(r.totalClients);
+  document.getElementById('floatingProfit').textContent = fmtKc(r.profit);
+
+  // Flash "Přepočteno" badge + hero pulse (přeskočit při initial load)
+  if (window._frInitialized) {
+    const badge = document.getElementById('recalcBadge');
+    const hero = document.getElementById('floatingRevenue');
+    badge.classList.remove('flash');
+    hero.classList.remove('pulse');
+    void badge.offsetWidth; // force reflow
+    void hero.offsetWidth;
+    badge.classList.add('flash');
+    hero.classList.add('pulse');
+  }
 }
 
 function drawChart(rPess, rReal, rOpt, pkgPrice) {
@@ -1290,6 +1383,65 @@ document.getElementById('shareBtn').addEventListener('click', () => {
 
 syncDependents();
 render();
+
+// === FLOATING WIDGET — show/hide logic ===
+// Show widget after user scrolls past header (no need for initial visibility),
+// hide when main BIG RESULT card is on screen (avoid duplication)
+let _frDismissed = false;
+const floatingEl = document.getElementById('floatingResult');
+const mainResultCard = document.querySelector('section.max-w-4xl > .card.mb-6.text-center');
+
+function updateFloatingVisibility() {
+  if (_frDismissed) {
+    floatingEl.classList.remove('visible');
+    return;
+  }
+  const scrolledPast = window.scrollY > 250;
+  if (!scrolledPast) {
+    floatingEl.classList.remove('visible');
+    return;
+  }
+  // Check if main result card is in viewport
+  if (mainResultCard) {
+    const rect = mainResultCard.getBoundingClientRect();
+    const viewportH = window.innerHeight;
+    const visible = rect.top < viewportH * 0.7 && rect.bottom > viewportH * 0.3;
+    if (visible) {
+      floatingEl.classList.add('hidden-by-result');
+      floatingEl.classList.remove('visible');
+    } else {
+      floatingEl.classList.remove('hidden-by-result');
+      floatingEl.classList.add('visible');
+    }
+  } else {
+    floatingEl.classList.add('visible');
+  }
+}
+
+window.addEventListener('scroll', updateFloatingVisibility, { passive: true });
+window.addEventListener('resize', updateFloatingVisibility, { passive: true });
+
+document.getElementById('frCloseBtn').addEventListener('click', () => {
+  _frDismissed = true;
+  floatingEl.classList.remove('visible');
+});
+
+// Init initial render flag (skip flash animation on first render)
+window._frInitialized = true;
+updateFloatingVisibility();
 </script>
+<!-- FLOATING TVŮJ VÝSLEDEK WIDGET (sticky, viditelný při editaci vstupů) -->
+<div id="floatingResult" class="floating-result">
+  <button class="fr-close" id="frCloseBtn" aria-label="Zavřít widget">×</button>
+  <div class="fr-label">⭐ Tvůj výsledek</div>
+  <div class="fr-hero" id="floatingRevenue">0 Kč</div>
+  <div class="fr-stat"><span>Návratnost</span><strong id="floatingROI">—</strong></div>
+  <div class="fr-stat"><span>Hráčů</span><strong id="floatingClients">0</strong></div>
+  <div class="fr-stat"><span>Profit</span><strong id="floatingProfit">0 Kč</strong></div>
+  <div class="text-center">
+    <span class="recalc-badge" id="recalcBadge">✨ Přepočteno</span>
+  </div>
+</div>
+
 </body>
 </html>
