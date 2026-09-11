@@ -123,8 +123,11 @@ h3{margin:0;line-height:1.35;font-weight:700;color:var(--navy);font-size:18px}
    v HTML kvůli vyhledávačům a kvůli chodu bez JavaScriptu. Nepřepínáme display
    na stovkách sousedních prvků - Safari v takovém případě nepřepočítal výšku
    rodiče a delší reference přetekla přes další sekci. */
+.slidewrap{position:relative}
 .slides{display:block;min-height:250px}
 .slide{contain:none}
+.sronly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0}
 #slidesrc .slide + .slide{margin-top:30px;padding-top:30px;border-top:1px solid var(--line)}
 .slide blockquote{margin:0;color:var(--black);font-size:clamp(17px,1.65vw,20px);
   line-height:1.78;font-weight:500}
@@ -150,12 +153,31 @@ h3{margin:0;line-height:1.35;font-weight:700;color:var(--navy);font-size:18px}
 .cprog:hover{background:#dfe3e8}
 @media(max-width:620px){
   .refs{padding:40px 0 4px}
-  .carousel{padding:24px 20px 20px;border-radius:8px}
-  .slides{min-height:330px}
+  .carousel{padding:22px 18px 16px;border-radius:8px}
+  /* Na mobilu má čtecí okno stálou výšku a roluje se uvnitř. Karta tím drží
+     jednu výšku bez ohledu na délku reference: šipky jsou pořád na obrazovce,
+     text pod ně nikdy nezasahuje a stránka při přepnutí neposkočí.
+     Sticky ani fixed lištu schválně nepoužíváme, v iOS Safari se kotví
+     k layout viewportu a schová se pod spodní lištu prohlížeče. */
+  .slidewrap.js .slides{height:min(54vh,400px);min-height:0;overflow-y:auto;
+    contain:layout;padding-right:2px;-webkit-overflow-scrolling:auto;
+    display:flex;flex-direction:column}
+  /* margin-block:auto vystředí krátkou referenci, a když se text nevejde,
+     margin se sám vynuluje. justify-content:center by u delšího textu
+     uřízl začátek, proto ho tu nepoužíváme. */
+  .slidewrap.js #live{margin-block:auto}
+  .slidewrap.js.scrollmore::after{content:"";position:absolute;left:0;right:0;bottom:0;
+    height:38px;pointer-events:none;
+    background:linear-gradient(to top,var(--white) 38%,rgba(255,255,255,0))}
   .slide blockquote{font-size:17px;line-height:1.75}
   .slide .sig b{font-size:16px}
-  .cnav{gap:14px;margin-top:20px;padding-top:16px}
+  .cnav{gap:14px;margin-top:18px;padding-top:14px}
   .cnav button.arw{width:54px;height:54px}
+  .cnav .count{font-size:15px;min-width:84px}
+}
+/* svh je přesnější než vh: nemění se, když iOS Safari sbalí adresní řádek */
+@supports (height:1svh){
+  @media(max-width:620px){ .slidewrap.js .slides{height:min(54svh,400px)} }
 }
 
 /* filters */
@@ -290,9 +312,10 @@ footer .fm{color:rgba(255,255,255,.82)}
       <p>S kýmkoliv z uvedených tě můžeme na vyžádání spojit pro tvé ověření.</p>
     </div>
     <div class="carousel">
-      <div class="slides" id="slides">
-        <article class="slide" id="live" aria-live="polite"></article>
-        <div id="slidesrc"><article class="slide"><blockquote>Díky tréninku se mi podařilo hlavně najít odvahu začít oslovovat své potenciální budoucí hráče. Překonala jsem svůj vlastní strach a dnes mám svého prvního platícího hráče. A co je pro mě ještě důležitější - mám odvahu oslovovat další lidi ze svého seznamu a pokračovat dál. Jsem připravena na NE. Dokonce ho chci oslavovat a vnímat jako příležitost - něco, co mě posouvá dál a učí mě nebát se dalších kroků. Pro mě tedy efekt tréninku není jen v tom, co jsem se naučila, ale i v tom, co jsem díky tomu začala dělat jinak ve svém vlastním životě.</blockquote><p class="sig"><b>Andrea Djurevska</b><span>09/2026</span></p></article>
+      <div class="slidewrap" id="slidewrap">
+        <div class="slides" id="slides">
+          <article class="slide" id="live"></article>
+          <div id="slidesrc"><article class="slide"><blockquote>Díky tréninku se mi podařilo hlavně najít odvahu začít oslovovat své potenciální budoucí hráče. Překonala jsem svůj vlastní strach a dnes mám svého prvního platícího hráče. A co je pro mě ještě důležitější - mám odvahu oslovovat další lidi ze svého seznamu a pokračovat dál. Jsem připravena na NE. Dokonce ho chci oslavovat a vnímat jako příležitost - něco, co mě posouvá dál a učí mě nebát se dalších kroků. Pro mě tedy efekt tréninku není jen v tom, co jsem se naučila, ale i v tom, co jsem díky tomu začala dělat jinak ve svém vlastním životě.</blockquote><p class="sig"><b>Andrea Djurevska</b><span>09/2026</span></p></article>
 <article class="slide"><blockquote>Když jsem do tréninku nastupovala, o koučování jsem nevěděla vlastně vůbec nic. O to více si dnes uvědomuji, jak velký kus cesty jsem za těch několik týdnů ušla. Naučila jsem se nejen spoustu technik, ale hlavně naslouchat a vnímat klienta, správně se ptát a postupně věřit sama sobě. Už nemám potřebu mít připravenou odpověď nebo řešení, ale učím se důvěřovat tomu, že si k němu klient dokáže dojít sám. A asi největším osobním přínosem pro mě je, že dnes vím, že mě koučování opravdu baví a že je to cesta, po které chci jít dál.</blockquote><p class="sig"><b>Iveta Lukášková</b><span>09/2026</span></p></article>
 <article class="slide"><blockquote>Protože CoachVille mění životy. U mne už bude navždy milník v životě před nástupem do CoachVille a po nástupu. Hodně se mi ulevilo, nikdo mne nehodnotí, naopak - chválí. S tím jsem se v životě moc nesetkala. Tato škola je opravdu skvělá. Získala jsem větší sebevědomí, cítím více přítomný okamžik, uspořádala jsem si některé své myšlenky a pocity, změnila jsem způsob přemýšlení a to je skvělé.</blockquote><p class="sig"><b>Hana Solfronková</b><span>09/2026</span></p></article>
 <article class="slide"><blockquote>Pre mňa je to posun na vyšší level. Z trénera so 16-ročnou praxou sa stávam transformačným koučom. Je to level, na ktorý sa chcem dostať a vnímam to ako veľmi veľký posun v kariére a teda má to obrovskú až nevyčísliteľnú hodnotu. Veľmi veľa vecí som si o sebe uvedomil, pomenoval ich nahlas a začal s nimi pracovať. Strašne si vážim prejavenú dôveru hráčov a zároveň je to potvrdením toho, že idem správnym smerom. Kurz je maximálne nabitý a na profi úrovni. Aktuálne nepoznám nič podobné, takže za mňa No1.</blockquote><p class="sig"><b>Tomáš Lapoš</b><span>09/2026</span></p></article>
@@ -625,7 +648,9 @@ footer .fm{color:rgba(255,255,255,.82)}
 <article class="slide"><blockquote>Uvědomění, jak přejít do mindsetu kouče. Zaujaly mě nové techniky koučování, které ve své praxi určitě využiji. Moje koučování se díky tréninku opět posunulo. Protože je to cesta nejen ke koučovací praxi, ale i k vlastnímu osobnímu rozvoji.</blockquote><p class="sig"><b>Miloslava Badalová</b><span>04/2023</span></p></article>
 <article class="slide"><blockquote>Velký vliv především na sebe - sebepoznání, větší sebevědomí, odvaha. I když ‚jenom přečtu' otázky ze sešitu, má to velký vliv na hráče a přináší to výsledky pro celý proces koučování. Transformace sebe sama.</blockquote><p class="sig"><b>Kateřina Maschlova</b><span>04/2023</span></p></article>
 <article class="slide"><blockquote>Líbilo se mi sdílení a praktikování. Celkově - velkou, přináší do života změny a posuny vpřed velmi rychle. Větší sebedůvěru v sebe sama, trénink mě naučil skvělé techniky. Spousta cenných rad a hodně praktikování.</blockquote><p class="sig"><b>Dana Mlejnková</b><span>04/2023</span></p></article></div>
+        </div>
       </div>
+      <p class="sronly" id="cstatus" role="status" aria-live="polite"></p>
       <div class="cnav">
         <button class="arw" id="prev" aria-label="Předchozí reference"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg></button>
         <span class="count"><span id="cur">1</span> / 333</span>
@@ -719,20 +744,43 @@ document.getElementById('catrow').innerHTML = catOrder.filter(c=>catCounts[c])
 (function(){
   var src=document.getElementById('slidesrc');
   var live=document.getElementById('live');
+  var wrap=document.getElementById('slidewrap');
+  var box=document.getElementById('slides');
   var sl=[].slice.call(src.querySelectorAll('.slide'));
   var bar=document.getElementById('cbar');
   var prog=document.getElementById('cprog');
+  var stat=document.getElementById('cstatus');
   var car=document.querySelector('.carousel');
   var cur=0;
-  // Zdrojový seznam schováme až tady. Bez JS zůstane viditelný celý.
+  // Zdrojový seznam schováme až tady. Bez JS zůstane viditelný celý
+  // a čtecí okno si nechá přirozenou výšku.
   src.style.display='none';
+  wrap.classList.add('js');
+  // Roluje se uvnitř okna, proto musí být dosažitelné i z klávesnice.
+  box.setAttribute('tabindex','0');
+  box.setAttribute('role','group');
+  box.setAttribute('aria-label','Text reference');
+
+  function fade(){
+    // Stín u spodní hrany jen tehdy, když text pokračuje mimo okno.
+    var more = box.scrollHeight - box.clientHeight - box.scrollTop > 8;
+    wrap.classList.toggle('scrollmore', more);
+  }
+  box.addEventListener('scroll', fade, {passive:true});
+  window.addEventListener('resize', fade);
+
   function go(n,keep){
     cur=(n+sl.length)%sl.length;
     live.innerHTML=sl[cur].innerHTML;
+    box.scrollTop=0;
     document.getElementById('cur').textContent=cur+1;
     bar.style.width=((cur+1)/sl.length*100)+'%';
+    // Odečítačkám hlásíme jen pořadí, ne celou referenci.
+    stat.textContent='Reference '+(cur+1)+' z '+sl.length;
     void live.offsetHeight;   // vynutí přepočet layoutu ještě před scrollem
-    if(!keep && car.getBoundingClientRect().top<0) car.scrollIntoView({block:'start'});
+    fade();
+    if(!keep && car.getBoundingClientRect().top<0)
+      car.scrollIntoView({block:'start',behavior:'instant'});
   }
   go(0,true);
   document.getElementById('prev').onclick=function(){go(cur-1);};
@@ -744,12 +792,18 @@ document.getElementById('catrow').innerHTML = catOrder.filter(c=>catCounts[c])
   car.addEventListener('keydown',function(e){
     if(e.key==='ArrowLeft'){e.preventDefault();go(cur-1);}
     if(e.key==='ArrowRight'){e.preventDefault();go(cur+1);}});
-  var x0=null;
-  car.addEventListener('touchstart',function(e){x0=e.changedTouches[0].clientX;},{passive:true});
+  // Swipe jen vodorovný. Uvnitř čtecího okna se svisle roluje text,
+  // proto rozhoduje poměr os, ne jen vzdálenost.
+  var x0=null,y0=null,t0=0;
+  car.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1){x0=null;return;}
+    x0=e.changedTouches[0].clientX; y0=e.changedTouches[0].clientY; t0=Date.now();
+  },{passive:true});
   car.addEventListener('touchend',function(e){
     if(x0===null) return;
-    var dx=e.changedTouches[0].clientX-x0;
-    if(Math.abs(dx)>45) go(dx<0?cur+1:cur-1);
+    var dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.5 && Date.now()-t0<600)
+      go(dx<0?cur+1:cur-1);
     x0=null;},{passive:true});
 })();
 
