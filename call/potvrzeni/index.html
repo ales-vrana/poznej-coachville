@@ -14,6 +14,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/styles.css" />
   <style>
+    .ok-form{width:100%;max-width:520px;text-align:center}
+    .ok-form label{display:block;font-weight:600;color:var(--navy);margin-bottom:.75rem;font-size:1rem}
+    .ok-form__row{display:flex;gap:.6rem;flex-wrap:wrap}
+    .ok-form input{flex:1 1 220px;min-width:0;padding:.9rem 1rem;border:1.5px solid var(--gray-line);border-radius:12px;font:inherit;font-size:1rem;color:var(--black);background:var(--white)}
+    .ok-form input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(56,192,195,.2)}
+    .ok-step .ok-form__err{color:#B3261E;font-size:.9rem;margin-top:.6rem;text-align:center}
+    .ok-form .btn{flex:1 1 140px;justify-content:center}
+    .ok-done{background:var(--cream);border:1px solid var(--gray-line);border-radius:var(--radius);padding:1.25rem 1.25rem;max-width:560px}
+    .ok-step .ok-done p{margin:0;color:var(--dark);font-size:1rem;line-height:1.6}
+    .ok-step .ok-done p.ok-done__title{font-size:1.4rem;font-weight:800;color:var(--teal-ink);margin-bottom:.4rem}
+    [hidden]{display:none!important}
     body{background:var(--white)}
     .ok-hero{background:var(--white);text-align:center;padding:1rem 0 0}
     .ok-hero__banner{width:100%;max-width:1000px;height:auto;margin:0 auto}
@@ -78,6 +89,25 @@
               </div>
               <div class="ok-video__frame"><iframe src="https://player.vimeo.com/video/1139976853?h=113f400a89&dnt=1&title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479" title="Úvodní video pro zájemce o vstup do CoachVille" loading="lazy" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
             </article>
+            <article class="ok-step" id="krok3">
+              <span class="ok-num">3</span>
+              <div>
+                <h2><small>Krok 3</small>Jakmile si přehraješ video, získej přístup do přípravného kurzu zdarma:</h2>
+              </div>
+              <button type="button" class="btn btn-primary" id="getAccess">Získat přístup do přípravného kurzu zdarma</button>
+              <form id="accessForm" class="ok-form" hidden novalidate>
+                <label for="accessEmail">Zadej svůj email, přístup ti odešleme emailem:</label>
+                <div class="ok-form__row">
+                  <input id="accessEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="tvuj@email.cz" required />
+                  <button type="submit" class="btn btn-primary" id="accessSend">Odeslat</button>
+                </div>
+                <p class="ok-form__err" id="accessErr" role="alert" hidden></p>
+              </form>
+              <div class="ok-done" id="accessDone" role="status" hidden>
+                <p class="ok-done__title">Hotovo!</p>
+                <p>Tvůj přístup do přípravného kurzu jsme ti právě odeslali emailem. Přehraj si první video ještě dnes a zjisti více. Najdeš tam i případové studie našich studentů.</p>
+              </div>
+            </article>
           </div>
         </div>
       </div>
@@ -104,6 +134,36 @@
         try { if (window.fbq) window.fbq('trackCustom','DoorClick',{door: el.dataset.door}); } catch(e){}
       });
     });
+
+    (function(){
+      var API='https://start.coachville.eu/api/auth/request';
+      var btn=document.getElementById('getAccess'), form=document.getElementById('accessForm'),
+          email=document.getElementById('accessEmail'), send=document.getElementById('accessSend'),
+          err=document.getElementById('accessErr'), done=document.getElementById('accessDone');
+      btn.addEventListener('click',function(){
+        btn.hidden=true; form.hidden=false; email.focus();
+        try{ if(window.fbq) window.fbq('trackCustom','AccessButtonClick'); }catch(e){}
+      });
+      form.addEventListener('submit',function(ev){
+        ev.preventDefault();
+        var v=(email.value||'').trim();
+        err.hidden=true;
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){ err.textContent='Zadej prosím platný e-mail.'; err.hidden=false; email.focus(); return; }
+        send.disabled=true; var old=send.textContent; send.textContent='Odesílám...';
+        fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:v})})
+          .then(function(r){return r.json().catch(function(){return {};}).then(function(j){return {ok:r.ok&&j.ok,j:j};});})
+          .then(function(res){
+            if(res.ok){
+              form.hidden=true; done.hidden=false;
+              try{ if(window.fbq) window.fbq('track','Lead',{content_name:'Pripravny kurz zdarma'}); }catch(e){}
+            } else { throw new Error((res.j&&res.j.error)||'x'); }
+          })
+          .catch(function(e){
+            err.textContent=(e&&e.message&&e.message!=='x'&&e.message!=='Failed to fetch')?e.message:'Odeslání se nepodařilo. Zkus to prosím znovu za chvíli.';
+            err.hidden=false; send.disabled=false; send.textContent=old;
+          });
+      });
+    })();
   </script>
 </body>
 </html>
